@@ -7,15 +7,13 @@ isCJKLanguage: true
 categories: ["Programming"]
 ---
 
-3度目の正直で，最後のブログを始めました...．前は org-mode を使って構築したのですが，記事が多くなり1ページだと読みづらいし，カテゴリ分けやパーマリンク的な仕組みが欲しくなってしまいました．
+3度目の正直でまたブログを始めました...．前は org-mode を使って構築したのですが，記事が多くなり1ページだと読みづらいし，カテゴリ分けやパーマリンク的な仕組みが欲しくなってしまいました．
 
 > 以前のページ https://shigekikarita.github.io/journal.html
 
 ## Hugo への移行
 
-巷ではHugoというGo言語製の静的サイト生成ツールが流行っていて，見た目もイケていて動作が軽いという噂でした．Go言語にも興味があったし，ox-hugoというツールを使えば org-mode から Hugo 用の markdown へ変換できて，公式に org-mode 自体もサポートされている (`markup="org"`) ということもあり移行を決めました．
-
-> ox-hugo https://ox-hugo.scripter.co/
+巷ではHugoというGo言語製の静的サイト生成ツールが流行っていて，見た目もイケていて動作が軽いという噂でした．Go言語にも興味がありましたし，公式に org-mode 自体もサポートされている (`markup="org"`) ということもあり移行を決めました．
 
 > https://gohugo.io/content-management/formats/
 
@@ -48,7 +46,7 @@ void main() {
 
 このサイトはgh-pages上でホストしているのですが，
 
-https://shigekikarita.github.io/log/
+https://github.com/ShigekiKarita/log/
 
 ```yaml
 sudo: false
@@ -78,7 +76,7 @@ deploy:
 こんな風にTravisを設定してデプロイしたのがこのページできます．
 
 - https://docs.travis-ci.com/user/deployment/pages/
-- https://github.com/ShigekiKarita/hugo-test/blob/master/.travis.yml
+- https://github.com/ShigekiKarita/log/blob/master/.travis.yml
 
 それか，私が作ったLinux用バイナリを使うなら
 
@@ -100,11 +98,11 @@ deploy:
     branch: master
 ```
 
-これで2分かかっていた Hugo 自体のビルド時間がなくなり，バイナリのDLだけになったので 30 sec 程度で markdown の push からサイトがビルドされました．以前、Jekyllを使っていたがどうもサイトの生成が遅かったので Hugo は素晴らしいですね．いまだに markdown よりも org-mode が好きなので，恋しくなったら ox-hugo 使ってみようと思いますが，結構手軽に書けるのでこのままでも良いかなと思ってます．
+これで2分かかっていた Hugo 自体のビルド時間がなくなり，バイナリのDLだけになったので 30 sec 程度で markdown の push からサイトがビルドされました．以前、Jekyllを使っていたがどうもサイトの生成が遅かったので Hugo は素晴らしいです．
 
 ## Hugo の追加設定
 
-Hugo の公式ドキュメントわかりにくい...けど有志の how-to が多くていいですね．
+Hugo公式ドキュメントわかりにくい...けど有志の how-to が多くていいです．
 
 - Mathjax https://gohugo.io/content-management/formats/#enable-mathjax
 - 選んだテーマ https://themes.gohugo.io/hugo-kiera/
