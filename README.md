@@ -1,6 +1,5 @@
-# Hugo test for D syntax highlight
+# log
 
-temp repo to check Chroma syntax highlight working for D language
+personal log on Hugo
 
-hosted at https://shigekikarita.github.io/hugo-test/posts/my-first-post/
-
+hosted at https://shigekikarita.github.io/log
