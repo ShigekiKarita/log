@@ -1,0 +1,8 @@
+baseURL = "https://shigekikarita.github.io/log/"
+languageCode = "jp"
+hasCJKLanguage = true
+title = "log"
+theme = "kiera"
+googleAnalytics = "UA-139201189-1"
+
+pygmentsCodefences=true

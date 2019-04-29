@@ -1,0 +1,15 @@
+sudo: false
+language: bash
+script:
+  - wget https://github.com/ShigekiKarita/hugo/releases/download/dlang-v1/hugo.tar.xz
+  - tar -xvf hugo.tar.xz
+  - ./hugo
+  - touch public/.nojekyll
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN # Set in travis-ci.org dashboard
+  local_dir: public
+  on:
+    branch: master
