@@ -3,6 +3,7 @@ title: "Hello Hugo"
 date: 2019-04-29T12:56:42+09:00
 draft: false
 tags: ["D", "Hugo", "Travis CI", "gh-pages"]
+isCJKLanguage: true
 categories: ["Programming"]
 ---
 
@@ -12,9 +13,11 @@ categories: ["Programming"]
 
 ## Hugo への移行
 
-巷ではHugoというGo言語製の静的サイト生成ツールが流行っていて，見た目もイケていて動作が軽いという噂でした．Go言語にも興味があったし，ox-hugoというツールを使えば org-mode から Hugo 用の markdown へ変換できるということもあり移行を決めました．
+巷ではHugoというGo言語製の静的サイト生成ツールが流行っていて，見た目もイケていて動作が軽いという噂でした．Go言語にも興味があったし，ox-hugoというツールを使えば org-mode から Hugo 用の markdown へ変換できて，公式に org-mode 自体もサポートされている (`markup="org"`) ということもあり移行を決めました．
 
 > ox-hugo https://ox-hugo.scripter.co/
+
+> https://gohugo.io/content-management/formats/
 
 そんなわけで，Hugoには期待していたのですが，当HPのメインコンテンツ(?)であるD言語のコードブロックにシンタックスハイライトがなくガッカリしまいました．とはいえハイライトをするChromaというツールのソースコードがびっくりするほど綺麗だったので，Go言語は全く知識がなかったのですが，その日のうちにPRを送ってみました．
 
