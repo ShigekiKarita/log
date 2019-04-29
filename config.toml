@@ -11,7 +11,7 @@ pygmentsCodefences=true
 [Author] # Used in authorbox
   name = "Shigeki Karita"
   bio = "D language man."
-  avatar = "img/avatar.png"
+  avatar = "img/avatar.jpg"
 
 
 [Params]
