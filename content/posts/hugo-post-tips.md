@@ -102,9 +102,11 @@ https://twitter.com/kaushalmodi/status/1074500107846840320
 
 https://golang.org/pkg/reflect/#Value.FieldByName
 
-エラー処理など真面目に作ると大変そうだが (Goでも既に大変そう)，D言語にも静的(コンパイル時)リフレクションがあるので実行時の文字列で与えられるフィールドにアクセスすることはできる．ちょっと書いてみるとこんな感じ
+エラー処理など真面目に作ると大変そうだが (Goでも既に大変そう)，D言語にも静的(コンパイル時**リフレクションがあるので実行時の文字列で与えられるフィールドにアクセスすることはできる．ちょっと書いてみるとこんな感じ
 
-```d
+**追記: ここのコードは間違いでした，この後のコードを見てください**
+
+```
 // D言語の構造体フィールドに実行時の名前でアクセス
 import std.stdio;
 
@@ -141,12 +143,49 @@ void main() {
 }
 ```
 
-やはりD言語の `__traits` 関係は何でも出来て最高．ところでこの `fieldByName` 関数の返り値の型って実行時にしか決まらないと思うんだけど，ちゃんと動いていて不思議だ．色々試したけど，変にコンパイラのチェックを逃れるわけでもなさそう．
+やはりD言語の `__traits` 関係は何でも出来て最高．ところでこの `fieldByName` 関数の返り値の型って実行時にしか決まらないと思うんだけど，ちゃんと動いていて不思議だ．<s>色々試したけど，変にコンパイラのチェックを逃れるわけでもなさそう?</s>
 
-D言語でもちゃんとしたテンプレートエンジンがある，DでHugoみたいなやつ作ってみようかな? https://qiita.com/repeatedly/items/300041d55fd5b45b69e1
+**追記: 暗黙の型変換だった**
+
+これ，D言語の暗黙の型変換の仕様のせいで `int` も `double` に変換されてた...．暗黙の型変換はやはり悪だと思った．それを防ぐ + 型変換できないフィールドに対応したのがこちら，さすがに動的に型変換するのはちょっと面倒なので型は静的に与えてます(Front Matter程度の使い方なら事前に型は決定しますよね...?)．
+
+```d
+import std.stdio;
+
+struct Hoge {
+	int N;
+    string S;
+}
+
+R fieldByName(R, T)(ref T x, string attr) {
+    static foreach (a; __traits(allMembers, T)) {
+        {
+            auto v = __traits(getMember, x, a);
+            static if (is(typeof(v) : R)) {
+                if (a == attr) return v;
+            }
+        }
+    }
+    assert(false, "not found name:" ~ attr ~ ", type: " ~ R.stringof ~ ".");
+}
+
+void main(string[] args) {
+    const Hoge h = {10, "aa"};
+
+    auto v = h.tupleof[0];
+    auto name = __traits(allMembers, Hoge)[0];
+
+    assert(h.fieldByName!(typeof(v))(name) == v);
+    assert(h.fieldByName!int("N") == 10);
+    assert(h.fieldByName!string("S") == "aa");
+}
+
+```
 
 
-> 追記: さっき twitter でD言語で実行時リフレクションライブラリがでてきたという話をみた． http://code.dlang.org/packages/hunt-reflection
+そうえいばD言語でもちゃんとしたテンプレートエンジンがある，DでHugoみたいなやつ作ってみようかな? https://qiita.com/repeatedly/items/300041d55fd5b45b69e1
+
+あとさっき twitter でD言語で実行時リフレクションライブラリがでてきたという話をみた． http://code.dlang.org/packages/hunt-reflection
 
 ## 最後に
 
