@@ -147,7 +147,7 @@ void main() {
 
 **追記: 暗黙の型変換だった**
 
-これ，D言語の暗黙の型変換の仕様のせいで `int` も `double` に変換されてた...．暗黙の型変換はやはり悪だと思った．対応したのがこちら，`std.variant.Variant` で型消去してます． https://dlang.org/phobos/std_variant.html
+これ，D言語の暗黙の型変換の仕様のせいで `int` も `double` に変換されてた...．暗黙の型変換はやはり悪だと思った．対応したのがこちら，`std.variant.VariantN` で型消去してます． https://dlang.org/phobos/std_variant.html
 
 ```d
 import std.stdio;
@@ -158,9 +158,17 @@ struct Hoge {
     string S;
 }
 
-Variant fieldByName(T)(ref T x, string attr) {
-    Variant v;
-    foreach (a; __traits(allMembers, T)) {
+auto maxFieldSize(T)() {
+    ulong size = 0;
+    foreach (m; T.init.tupleof) {
+        if (size < m.sizeof) size = m.sizeof;
+    }
+    return size;
+}
+
+auto fieldByName(T)(ref T x, string attr) {
+    VariantN!(maxFieldSize!T) v;
+    foreach (a; __traits(allMembers, T)){ 
         if (a == attr) {
             v = __traits(getMember, x, a);
             break;
