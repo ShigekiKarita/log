@@ -10,12 +10,21 @@ pygmentsCodefences=true
 
 [Author] # Used in authorbox
   name = "Shigeki Karita"
-  bio = "D language man."
+  bio = "D言語と日々の研究について雑記"
   avatar = "img/avatar.jpg"
+
+[menu]
+
+  [[menu.main]]
+    identifier = "root"
+    name = "karitech"
+    pre = "<i class='fa fa-heart'></i>"
+    url = "https://shigekikarita.github.io"
+    weight = -110
 
 
 [Params]
-  subtitle = "of karita" # Subtitle of your site. Used in site header
+  subtitle = "" # Subtitle of your site. Used in site header
   description = "personal blog about everything" # Site description. Used in meta description
   copyright = "karitech" # copyright holder, otherwise will use site title
   opengraph = true # Enable OpenGraph if true
@@ -35,7 +44,7 @@ pygmentsCodefences=true
 
 
 [Params.sidebar]
-  home = "right" # Configure layout for home page
+  home = "left" # Configure layout for home page
   list = "left"  # Configure layout for list pages
   single = false # Configure layout for single pages
   # Enable widgets in given order

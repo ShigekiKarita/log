@@ -1,0 +1,14 @@
+#+title: {{ replace .Name "-" " " | title }}
+#+summary:
+#+categories: uncategorized
+#+tags:
+#+draft: true
+#+date: {{ .Date }}
+#+author: Shigeki Karita
+#+isCJKLanguage: true
+#+markup: org
+#+toc: false
+
+** tl;dr
+
+** reference

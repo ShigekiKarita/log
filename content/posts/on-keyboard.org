@@ -1,0 +1,19 @@
+#+title: On Keyboard
+#+summary: Realforce, FILCO と比べて HHKBが一番好きだった
+#+categories: hardware
+#+tags: keyboard
+#+draft: true
+#+date: 2019-04-30T12:59:41+09:00
+#+author: Shigeki Karita
+#+isCJKLanguage: true
+#+markup: org
+
+* tl;dr
+
+Realforce, FILCO と比べて HHKBが一番好きだった
+
+* future work
+
+kinesis とか左右分離系キーボードも試していきたい．US配列に慣れたい．
+
+* reference

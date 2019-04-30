@@ -261,12 +261,12 @@ samp {
 
 pre,
 code {
-	background-color: #ccc;
+	background-color: #332;
 }
 
 code {
-	padding: 0 5px;
-	color: #c33;
+	padding:  5px;
+	color: #eee;
 }
 
 pre {
