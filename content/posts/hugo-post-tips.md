@@ -147,26 +147,26 @@ void main() {
 
 **追記: 暗黙の型変換だった**
 
-これ，D言語の暗黙の型変換の仕様のせいで `int` も `double` に変換されてた...．暗黙の型変換はやはり悪だと思った．それを防ぐ + 型変換できないフィールドに対応したのがこちら，さすがに動的に型変換するのはちょっと面倒なので型は静的に与えてます(Front Matter程度の使い方なら返す前に文字列化してもいいですかね?)．
+これ，D言語の暗黙の型変換の仕様のせいで `int` も `double` に変換されてた...．暗黙の型変換はやはり悪だと思った．対応したのがこちら，`std.variant.Variant` で型消去してます． https://dlang.org/phobos/std_variant.html
 
 ```d
 import std.stdio;
+import std.variant;
 
 struct Hoge {
 	int N;
     string S;
 }
 
-R fieldByName(R, T)(ref T x, string attr) {
-    static foreach (a; __traits(allMembers, T)) {
-        {
-            auto v = __traits(getMember, x, a);
-            static if (is(typeof(v) : R)) {
-                if (a == attr) return v;
-            }
+Variant fieldByName(T)(ref T x, string attr) {
+    Variant v;
+    foreach (a; __traits(allMembers, T)) {
+        if (a == attr) {
+            v = __traits(getMember, x, a);
+            break;
         }
     }
-    assert(false, "not found name:" ~ attr ~ ", type: " ~ R.stringof ~ ".");
+    return v;
 }
 
 void main(string[] args) {
@@ -175,11 +175,16 @@ void main(string[] args) {
     auto v = h.tupleof[0];
     auto name = __traits(allMembers, Hoge)[0];
 
-    assert(h.fieldByName!(typeof(v))(name) == v);
-    assert(h.fieldByName!int("N") == 10);
-    assert(h.fieldByName!string("S") == "aa");
+    assert(h.fieldByName(name) == v);
+    assert(h.fieldByName("N") == 10);
+    assert(h.fieldByName("S") == "aa");
+    // 元の Go のコード https://kwmt27.net/index.php/2013/10/02/get-field-value-of-struct-with-reflect-golang/
+    // v := reflect.ValueOf(h) //Value
+    // t := v.Type()           //Type
+    // name := t.Field(0).Name
+    // fmt.Println(name) //フィールド：N
+    // fmt.Println(v.FieldByName(name).Interface()) //h.Nの値
 }
-
 ```
 
 
