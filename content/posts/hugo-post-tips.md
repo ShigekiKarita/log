@@ -13,7 +13,8 @@ markup: "md"
 ## tl;dr
 
 ファイル `archetypes/default.md` に自分好みのテンプレを作ってボイラープレートを減らそう．最終的な `org-mode` 用の設定はこれ 
-https://raw.githubusercontent.com/ShigekiKarita/log/master/archetypes/default.log
+
+> https://raw.githubusercontent.com/ShigekiKarita/log/master/archetypes/default.org
 
 ## はじめに
 
