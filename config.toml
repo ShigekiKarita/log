@@ -21,7 +21,18 @@ pygmentsCodefences=true
     pre = "<i class='fa fa-heart'></i>"
     url = "https://shigekikarita.github.io"
     weight = -110
-
+  [[menu.main]]
+    identifier = "travis"
+    name = "travis"
+    pre = "<i class='fa fa-heart'></i>"
+    url = "https://travis-ci.org/ShigekiKarita/log"
+    weight = -10
+  [[menu.main]]
+    identifier = "github"
+    name = "github"
+    pre = "<i class='fa fa-heart'></i>"
+    url = "https://github.com/ShigekiKarita/log"
+    weight = -10
 
 [Params]
   subtitle = "" # Subtitle of your site. Used in site header

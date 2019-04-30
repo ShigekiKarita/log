@@ -18,7 +18,7 @@ markup: "md"
 
 ## はじめに
 
-以前 Jekyll や org-mode でブログ書いてた時によく思ってたのが，タイトルとか日付を書くヘッダー的な部分をもっとテンプレ化しておきたいということ．移行した Hugo ではヘッダー的な部分を Front Matter と読んでいて，ユーザ定義もできたり無限に属性がある．
+以前 Jekyll や org-mode でブログ書いてた時によく思ってたのが，タイトルとか日付といった「属性」を書くヘッダー的な部分をもっとテンプレ化しておきたいということ．移行した Hugo ではヘッダー的な部分を「Front Matter」と読んでいて，ユーザ定義もできたり無限に属性がある．
 
 https://gohugo.io/content-management/front-matter/
 
@@ -28,11 +28,11 @@ Hugo といえば markdown で書いている人が多いと思うのですが�
 $ hugo new posts/xxx.md
 ```
 
-みたいなコマンドで新しい記事を生成するとき，そのテンプレ `default.md` が選ばれて，その中のプレースホルダーが置き換えられるらしい．
+みたいなコマンドで新しい記事を生成するとき，そのテンプレ `archetypes/default.md` が選ばれて，その中のプレースホルダーが置き換えられるらしい．
 
 ## 課題
 
-org-mode でのテンプレを作る方法がよくわからない．例えば markdown をこんな感じで設定しています．
+org-mode でのテンプレを作る方法がよくわからない．例えば markdown では `archetypes/default.md` をこんな感じで設定しています．
 
 ```md
 ---
@@ -76,13 +76,12 @@ https://gohugo.io/content-management/front-matter/#front-matter-formats
 ** reference
 ```
 
-これはどうやら org-mode 独自のヘッダーのようで，Front Matter 第四の記法というわけか．主な文法としては
+どうやら org-mode 独自のヘッダーのようで，Front Matter 第四の記法というわけです．主な文法としては
 
 - 文字列を引用符でくくらない．引用符もそのまま出力されてしまう
 - tags のようなリスト値は `#+tags: foo bar` みたいな書き方
 
-
-文法はマニュアルを見てみたけど，いまいち細かいことはわからない
+といった具合．文法はマニュアルを見てみたけど，いまいち細かいことはわからない．
 https://orgmode.org/manual/Property-Syntax.html#Property-Syntax
 
 Hugo 側で独自に解釈しているところもあるっぽいので開発者(?)の具体例を見たほうが良い．
@@ -93,10 +92,8 @@ https://gitlab.com/kaushalmodi/hugo-sandbox/
 > You can mix all types in the same Hugo site simultaneously (either by name (*.md, *.org etc.) or by markdown=org etc. in front matter)).
 > https://discourse.gohugo.io/t/how-to-use-org-mode-with-hugo/6430/6
 
-最新の Hugo では `content` とわける必要はないそうだ．ところで Kaushal 氏はシングルファイルの org-mode を Hugo に出力するツール ox-hugo の開発者であり，twitterなどでもときどき拾ってくれるようなので，ハマった時はフォーラムなりtwitterに投げてみようと思う．
-
+というわけで，最新の Hugo では `content` とわける必要はないそうだ．ところで Kaushal 氏はシングルファイルの org-mode を Hugo に出力するツール ox-hugo の開発者であり，twitterなどでもときどき拾ってくれるようなので，ハマった時はフォーラムなりtwitterに投げてみようと思う．
 https://twitter.com/kaushalmodi/status/1074500107846840320
-
 
 
 ## 余談
@@ -144,7 +141,7 @@ void main() {
 }
 ```
 
-やはりD言語の `__traits` 関係は何でも出来て最高．ところでこの `fieldByName` 関数の返り値の型って実行時にしか決まらないと思うんだけど，ちゃんと動いていて不思議だ．
+やはりD言語の `__traits` 関係は何でも出来て最高．ところでこの `fieldByName` 関数の返り値の型って実行時にしか決まらないと思うんだけど，ちゃんと動いていて不思議だ．色々試したけど，変にコンパイラのチェックを逃れるわけでもなさそう．
 
 ## 最後に
 
