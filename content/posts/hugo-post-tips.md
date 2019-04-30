@@ -96,58 +96,13 @@ https://gitlab.com/kaushalmodi/hugo-sandbox/
 https://twitter.com/kaushalmodi/status/1074500107846840320
 
 
-## 余談
+## 余談: D言語で実行時リフレクション
 
 [mustache](http://mustache.github.io/)テンプレートエンジンのような記法で， `.Name` とか明らかに Go っぽいフィールドにアクセスしていて，どうやってるのかなと色々調べたら， Go 言語にはリフレクションの公式パッケージがあるようだ．これは結構 Web 系のフレームワーク作りやすい気がする．
 
 https://golang.org/pkg/reflect/#Value.FieldByName
 
-エラー処理など真面目に作ると大変そうだが (Goでも既に大変そう)，D言語にも静的(コンパイル時**リフレクションがあるので実行時の文字列で与えられるフィールドにアクセスすることはできる．ちょっと書いてみるとこんな感じ
-
-**追記: ここのコードは間違いでした，この後のコードを見てください**
-
-```
-// D言語の構造体フィールドに実行時の名前でアクセス
-import std.stdio;
-
-struct Hoge {
-	int N;
-    double D;
-}
-
-auto fieldByName(T)(ref T x, string attr) {
-    foreach (a; __traits(allMembers, T)) {
-        if (a == attr) {
-            return  __traits(getMember, x, a);
-        }
-    }
-    assert(false, "not found: " ~ attr);
-}
-
-void main() {
-    Hoge h = {10, 2.0};
-
-    auto v = h.tupleof[0];
-    auto name = __traits(allMembers, Hoge)[0];
-
-    assert(h.fieldByName(name) == v);
-    assert(h.fieldByName("N") == 10);
-    assert(h.fieldByName("D") == 2.0);
-
-    // 元の Go のコード https://kwmt27.net/index.php/2013/10/02/get-field-value-of-struct-with-reflect-golang/
-    // v := reflect.ValueOf(h) //Value
-    // t := v.Type()           //Type
-    // name := t.Field(0).Name
-    // fmt.Println(name) //フィールド：N
-    // fmt.Println(v.FieldByName(name).Interface()) //h.Nの値
-}
-```
-
-やはりD言語の `__traits` 関係は何でも出来て最高．ところでこの `fieldByName` 関数の返り値の型って実行時にしか決まらないと思うんだけど，ちゃんと動いていて不思議だ．<s>色々試したけど，変にコンパイラのチェックを逃れるわけでもなさそう?</s>
-
-**追記: 暗黙の型変換だった**
-
-これ，D言語の暗黙の型変換の仕様のせいで `int` も `double` に変換されてた...．暗黙の型変換はやはり悪だと思った．対応したのがこちら，`std.variant.VariantN` で型消去してます． https://dlang.org/phobos/std_variant.html
+エラー処理など真面目に作ると大変そうだが (Goでも既に大変そう)，D言語にもコンパイル時リフレクションがあるので実行時の文字列で与えられるフィールドにアクセスすることはできる．ちょっと書いてみた．
 
 ```d
 import std.stdio;
@@ -194,7 +149,7 @@ void main(string[] args) {
     // fmt.Println(v.FieldByName(name).Interface()) //h.Nの値
 }
 ```
-
+やはりD言語の `__traits` 関係は何でも出来て最高．返り値を `std.variant.VariantN` で型消去してます． https://dlang.org/phobos/std_variant.html
 
 そうえいばD言語でもちゃんとしたテンプレートエンジンがある，DでHugoみたいなやつ作ってみようかな? https://qiita.com/repeatedly/items/300041d55fd5b45b69e1
 
