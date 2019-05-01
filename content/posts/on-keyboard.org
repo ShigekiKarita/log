@@ -19,7 +19,8 @@
 ある程度の期間使ってきた感想を書きます．店頭ではわからないけど，煩さは静かな環境で使って初めてわかるし，打鍵速度も実際にPCに繋いでみると微妙に体感が違うことがありそういう雰囲気を重視して書いています．評価数値は実際に測ったわけではなくあくまで主観です．5段階評価としてます．
 
 *** FILCO Majestouch MINILA
-[[file:/img/minila.jpg]]
+
+[[file:./minila.jpg]]
 
 > [[https://www.diatec.co.jp/products/det.php?prod_c=1316]]
 
@@ -48,7 +49,7 @@ Mejestouchに共通する個性としては，とにかく楽しいです．キ�
 
 *** 東プレ Realforce 91UDK-G 
 
-[[file:/img/realforce.jpg]]
+[[file:./keyboards/realforce.jpg]]
 
 > [[https://www.diatec.co.jp/shop/det.php?prod_c=588]]
 
@@ -62,7 +63,7 @@ Realforceの良いところはMejestouchと違ってシットリした質感で�
 
 *** PFU Happy Hacking Keyboard Professional JP
 
-[[file:/img/hhkb.jpg]]
+[[file:./keyboards/hhkb.jpg]]
 
 > [[https://www.pfu.fujitsu.com/hhkeyboard/hhkbprojp/]]
 
@@ -88,7 +89,7 @@ HHKBの良いところはとにかく小さいところです．その割に作�
 
 結論としては HHKB を一番よく使ってます．この写真は私の自室で，環境構築厨なのでモニターアームを付けた4Kディスプレイを最近導入しました．
 
-[[file:/img/desktop.jpg]]
+[[file:./keyboards/desktop.jpg]]
 
 実際には今回挙げたキーボードのどれか1つ買っても十分満足できるでしょう．ミニマルな感じが好きなのでHHKBを贔屓してしまうけど，テンキー必須な人とかは全然逆の感想になるだろうと思います．個人的にはメカニカル式と静電容量無接点方式は良い意味で違いがほとんどわからないレベルです．今回挙げたキーボードと比べるものではないけどノートPCのキーボードではダントツThinkpad X1のキーボードが使いやすいです，今ではキーボードを持ち歩かなくなりました．とはいえキーボードの世界はまだ広く，今後は敬遠していた kinesis とか左右分離系キーボードも試していきたい．US配列に慣れたいです．
 
