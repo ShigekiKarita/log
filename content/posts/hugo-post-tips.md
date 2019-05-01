@@ -79,26 +79,45 @@ https://gohugo.io/content-management/front-matter/#front-matter-formats
 どうやら org-mode 独自のヘッダーのようで，Front Matter 第四の記法というわけです．主な文法としては
 
 - 文字列を引用符でくくらない．引用符もそのまま出力されてしまう
-- tags のようなリスト値は `#+tags: foo bar` みたいな書き方
+- tags のようなリスト値は `#+tags: foo bar** みたいな書き方
 
 といった具合．文法はマニュアルを見てみたけど，いまいち細かいことはわからない．
 https://orgmode.org/manual/Property-Syntax.html#Property-Syntax
 
-Hugo 側で独自に解釈しているところもあるっぽいので開発者(?)の具体例を見たほうが良い．
-https://gitlab.com/kaushalmodi/hugo-sandbox/
+Hugo 側で独自に解釈しているところもあるっぽい．
 
-このリポジトリの `content-org` というディレクトリにおいてある org-mode でかかれた記事群が参考になる．READMEによると `content` ディレクトリとは別にすべきとあるが，フォーラムによると
+## こまかい話
 
-> You can mix all types in the same Hugo site simultaneously (either by name (*.md, *.org etc.) or by markdown=org etc. in front matter)).
-> https://discourse.gohugo.io/t/how-to-use-org-mode-with-hugo/6430/6
+具体的な書き方として， **一番役に立ったのはこの人のブログだ．**  とにかく沢山の記事がある．
 
-というわけで，最新の Hugo では `content` とわける必要はないそうだ．ところで Kaushal 氏はシングルファイルの org-mode を Hugo に出力するツール ox-hugo の開発者であり，twitterなどでもときどき拾ってくれるようなので，ハマった時はフォーラムなりtwitterに投げてみようと思う．
-https://twitter.com/kaushalmodi/status/1074500107846840320
+- ソース https://github.com/hiroakit/blog
+- 解説など https://www.hiroakit.com/2018/03/hugo-with-netlify/
+
+この記事や手元の挙動を見ていると幾つか注意点として
+
+- markdown と違って org-mode の baseURL 的な解釈はうまくいってないようだ．
+- 例えばローカルの画像ファイルなどは記事ディレクトリを作り直下に置いて相対パスで指定するのがよい，その際に記事は `index.org` というファイル名に書く
+- そもそも mustache 的なテンプレートは効かない?
+- シンタックスハイライトは `#+begin_src perl` のような小文字ではダメで `#+BEGIN_SRC perl` としなければならない
+
+
+```org
+# content/posts/foo/index.org という org ファイルを作ると
+# {{ baseURL }}/posts/foo/index.html として生成される
+
+# 大文字じゃないとダメ
+#+BEGIN_SRC d
+void main() {}
+#+END_SRC
+
+# 画像 content/posts/foo/bar.png というファイル
+[[file:./bar.png]]
+```
 
 
 ## 余談: D言語で実行時リフレクション
 
-[mustache](http://mustache.github.io/)テンプレートエンジンのような記法で， `.Name` とか明らかに Go っぽいフィールドにアクセスしていて，どうやってるのかなと色々調べたら， Go 言語にはリフレクションの公式パッケージがあるようだ．これは結構 Web 系のフレームワーク作りやすい気がする．
+[mustache](http://mustache.github.io/)テンプレートエンジンといえば，Front Matterなんかは `.Name` とか明らかに Go っぽいフィールドにアクセスしていて，どうやってるのかなと色々調べたら， Go 言語にはリフレクションの公式パッケージがあるようだ．これは結構 Web 系のフレームワーク作りやすい気がする．
 
 https://golang.org/pkg/reflect/#Value.FieldByName
 
