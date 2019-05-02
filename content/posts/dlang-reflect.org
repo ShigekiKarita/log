@@ -1,0 +1,224 @@
+#+title: D言語の実行時リフレクション
+#+summary:
+#+categories: Programming
+#+tags: D
+#+draft: false
+#+date: 2019-05-02T20:27:21+09:00
+#+author: Shigeki Karita
+#+isCJKLanguage: true
+#+markup: org
+#+toc: false
+
+** tl;dr
+
+この前書いたD言語の実行時リフレクション，実行時の文字列からフィールドを呼び出す getter を書き直して， setter も作ったよ．
+
+** 前回の get 実装
+
+[[https://shigekikarita.github.io/log/posts/hugo-post-tips/]]
+
+前回の実装では foreach を回して実行時文字列とコンパイル時フィールド名が一致する場合，そのフィールドをVariantで型消去して返すというものでした．
+
+#+BEGIN_SRC d
+/// 型Tの全メンバのうち最大のサイズを返す
+auto maxFieldSize(T)() {
+    ulong size = 0;
+    foreach (m; T.init.tupleof) {
+        if (size < m.sizeof) size = m.sizeof;
+    }
+    return size;
+}
+
+/// attr と同じ名前のメンバをVariantに入れて返す
+auto fieldByName(T)(ref T x, string attr) {
+    import std.variant : VariantN;
+    VariantN!(maxFieldSize!T) v;
+    foreach (a; __traits(allMembers, T)){ 
+        if (a == attr) {
+            v = __traits(getMember, x, a);
+            break;
+        }
+    }
+    return v;
+}
+
+struct Hoge {
+	int N;
+    string S;
+}
+
+unittest {
+    Hoge h = {10, "aa"};
+
+    assert(h.fieldByName(name) == v);
+    assert(h.fieldByName("N") == 10);
+    assert(h.fieldByName("S") == "aa");
+}
+
+#+END_SRC
+
+** 新しい get 実装
+
+[[https://twitter.com/lempiji/status/1123201897710514176]]
+
+twitterで ~switch~ + ~static foreach~ で実装した方が効率良いよと教えてもらったのでやってみました．
+#+BEGIN_SRC d
+auto get(T)(ref T x, string attr) {
+    import std.traits : isFunction;
+
+    VariantN!(maxFieldSize!T) v;
+    switch (attr) {
+    static foreach (a; __traits(allMembers, T)) {
+        case a:
+            static if (isFunction!(__traits(getMember, x, a))) {
+                v = & __traits(getMember, x, a);
+            } else {
+                v = __traits(getMember, x, a);
+            }
+            return v;
+    }
+    default:
+        return v;
+    }
+}
+#+END_SRC
+~static foreach~ はスコープを作らないので展開後のコードは ~case a:~  を何個か並べたものになるのですが，これは中々パワーっていう感じがして厳ついですね．あと関数のときは即時評価されないよう関数ポインタにして格納するようにしました．
+
+あとパワー系の実装といえば *コンパイル時連想配列* を使う方法も考えました．
+#+BEGIN_SRC d
+auto get(T)(ref T x, string attr) {
+    alias V = VariantN!(maxFieldSize!T);
+    alias F = V function(ref T)
+    // コンパイル時連想配列
+    enum dict = {
+        F[string] ret;
+        static foreach (a; __traits(allMembers, T)) {
+            ret[a] = (ref T t) { V u; u = __traits(getMember, t, a); return u; };
+        }
+        return ret;
+    }();
+    return dict[attr](x);
+#+END_SRC
+
+これは ~switch~ の例では「 ~switch~ をコンパイラがジャンプテーブルに変換して定数オーダでフィールドを探索できること」を期待しているのですが，連想配列を自力で用意することで定数オーダを実現できます．現実的にはコードサイズは膨れ上がりそうなので，フラグで速度やサイズを判断できるコンパイラに任せる方がいいと思います．
+
+** set 実装
+
+~switch~ を使って同じ雰囲気で setter も作れます．
+#+BEGIN_SRC d
+ref set(V, T)(ref T x, string attr, V val) {
+    switch (attr) {
+    static foreach (a; __traits(allMembers, T)){
+        static if (is(typeof(__traits(getMember, x, a)) : V)) {
+            case a:
+                __traits(getMember, x, a) = val;
+                return x;
+        }
+    }
+    default:
+        assert(false, attr ~ " not found");
+    }
+}
+#+END_SRC
+注意すべきなのは ~static if~ の部分がないと，次のようなコードが展開されてしまいコンパイルエラーになります．ちなみに ~static foreach~ と同様にスコープを作りません．
+#+BEGIN_SRC d
+struct Hoge {
+    int i;
+    string s;
+}
+
+// インスタンス化された set 関数
+ref set(ref Hoge x, string attr, int val) {
+    switch (attr) {
+    case "i":
+        x.i = val;
+    case "s":
+        x.s = val; // string に int は代入できない
+    ...
+}
+#+END_SRC
+
+
+** 全体のコード
+
+#+BEGIN_SRC d
+import std.variant;
+
+auto maxFieldSize(T)() {
+    ulong size = 0;
+    foreach (m; T.init.tupleof) {
+        if (size < m.sizeof) size = m.sizeof;
+    }
+    return size;
+}
+
+auto get(T)(ref T x, string attr) {
+    import std.traits : isFunction;
+
+    VariantN!(maxFieldSize!T) v;
+    switch (attr) {
+    static foreach (a; __traits(allMembers, T)) {
+        case a:
+            static if (isFunction!(__traits(getMember, x, a))) {
+                v = & __traits(getMember, x, a);
+            } else {
+                v = __traits(getMember, x, a);
+            }
+            return v;
+    }
+    default:
+        return v;
+    }
+}
+
+ref set(V, T)(ref T x, string attr, V val) {
+    switch (attr) {
+    static foreach (a; __traits(allMembers, T)){
+        static if (is(typeof(__traits(getMember, x, a)) : V)) {
+            case a:
+                __traits(getMember, x, a) = val;
+                return x;
+        }
+    }
+    default:
+        assert(false, attr ~ " not found");
+    }
+}
+
+
+struct Hoge {
+	int N;
+    string S;
+    int delegate(int) f;
+
+    auto mul(int x) {
+        return N * x;
+    }
+}
+
+unittest {
+    Hoge h = {10, "aa"};
+
+    assert(h.get("N") == 10);
+    assert(h.get("S") == "aa");
+    assert(h.get("N") * 2 == 20);
+    assert(h.get("mul")(10) == 100);
+
+    assert(h.set("N", 1).get("N") == 1);
+    assert(h.set("S", "hi").get("S") == "hi");
+    assert(h.set!(typeof(h.f))("f", &h.mul).get("f")(2) == h.mul(2));
+}
+#+END_SRC
+理想としては set 関数の val に Variant も渡せるようになればかなり実用的なレベルになると思うのですが，エラーチェックとかしんどくなるのでやめました．
+
+** 力こそパワー
+
+よく考えたら実行時 eval 作ればいいだけじゃんという脳筋な発想に至り， drepl
+
+[[https://github.com/dlang-community/drepl]]
+
+をベースに実行時の文字列を dynamic library にコンパイルして dynamic load すればいいじゃん！と思ったものの，以前 drepl の作者と議論した ODR 違反の話
+
+[[https://github.com/dlang-community/drepl/issues/4]]
+
+とかこれも真面目にやるとつらいし，そもそも実行時 eval は Ruby でいう binding とかがなければ Rails みたいなフレームワーク作る上で実用的ではないし，壮大すぎるなぁとつらくなり，手が止まっています．もっとパワーをつけたいです．
