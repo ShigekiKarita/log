@@ -1,0 +1,16 @@
+#+title: Dlang Better C Unittest
+#+summary:
+#+categories: uncategorized
+#+tags:
+#+draft: true
+#+date: 2019-05-04T00:19:27+09:00
+#+author: Shigeki Karita
+#+isCJKLanguage: true
+#+markup: org
+#+toc: false
+
+** tl;dr
+
+Better Cモードだとランタイムがないので，unittestが自動実行されない，そこで各モジュールからunittestブロックを集めて実行する方法を調べた．
+
+** reference
