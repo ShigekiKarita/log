@@ -135,7 +135,7 @@ textarea {
 
 .btn:hover {
 	color: #fff;
-	background: #e2dd30;
+	background: #e2dddd;
 }
 
 /* Animation */
@@ -155,7 +155,7 @@ h6 {
 	margin: 0 0 1.25rem;
 	font-weight: 700;
 	line-height: 1.3;
-	color: #e2bb30;
+	color: #ccc;
 }
 
 h1 {
@@ -194,7 +194,7 @@ a {
 }
 
 a:hover {
-	color: #e2dd30;
+	color: #e2dddd;
 }
 
 hr {
@@ -261,12 +261,12 @@ samp {
 
 pre,
 code {
-	background-color: #ccc;
+	background-color: #332;
 }
 
 code {
-	padding: 0 5px;
-	color: #c33;
+	padding:  5px;
+	color: #eee;
 }
 
 pre {
@@ -299,8 +299,8 @@ blockquote {
 	margin: 0 0 20px;
 	margin: 0 0 1.25rem;
 	line-height: 1.6;
-  /* #e2dd30 #222d30 */
-	border-left: 5px solid #e2dd30;
+  /* #e2dddd #222d30 */
+	border-left: 5px solid #e2dddd;
 }
 
 blockquote p:last-child {
@@ -407,14 +407,14 @@ select {
 	font-size: .875rem;
 	font-weight: 700;
 	line-height: 1;
-	color: #e2dd30;
+	color: #e2dddd;
 	border-top: 1px solid #ebebeb;
 }
 
 .divider {
 	height: 5px;
 	margin: 0;
-	background: #e2dd30;
+	background: #e2dddd;
 	border: 0;
 }
 
@@ -451,7 +451,7 @@ select {
 }
 
 :focus > .menu__btn-title {
-	box-shadow: inset 0 0 1px 3px #e2dd30;
+	box-shadow: inset 0 0 1px 3px #e2dddd;
 }
 
 button:not(:-moz-focusring):focus > .menu__btn-title {
@@ -464,7 +464,7 @@ button:not(:-moz-focusring):focus > .menu__btn-title {
 }
 
 .js .menu__btn--active {
-	color: #e2dd30;
+	color: #e2dddd;
 }
 
 .menu__list {
@@ -473,7 +473,7 @@ button:not(:-moz-focusring):focus > .menu__btn-title {
 }
 
 .menu__item:hover {
-	background: #e2dd30;
+	background: #e2dddd;
 }
 
 .menu__item:first-child {
@@ -481,7 +481,7 @@ button:not(:-moz-focusring):focus > .menu__btn-title {
 }
 
 .menu__item--active {
-	background: #e2dd30;
+	background: #e2dddd;
 }
 
 .menu__link {
@@ -522,7 +522,7 @@ button:not(:-moz-focusring):focus > .menu__btn-title {
 
 @media screen and (min-width: 767px) {
 	.menu {
-		border-bottom: 5px solid #e2dd30;
+		border-bottom: 5px solid #e2dddd;
 	}
 
 	.menu__btn {
@@ -576,7 +576,7 @@ button:not(:-moz-focusring):focus > .menu__btn-title {
 }
 
 .meta a:hover {
-	color: #e2dd30;
+	color: #e2dddd;
 }
 
 .meta__item {
@@ -632,12 +632,12 @@ button:not(:-moz-focusring):focus > .menu__btn-title {
 .content a,
 .warning a {
 	font-weight: 700;
-	color: #e2dd30;
+	color: #e2dddd;
 }
 
 .content a:hover,
 .warning a:hover {
-	color: #e2dd30;
+	color: #e2dddd;
 	text-decoration: underline;
 }
 
@@ -711,7 +711,7 @@ button:not(:-moz-focusring):focus > .menu__btn-title {
 }
 
 .tags__item:hover {
-	background: #e2dd30;
+	background: #e2dddd;
 }
 
 .tags__link,
@@ -726,7 +726,7 @@ button:not(:-moz-focusring):focus > .menu__btn-title {
 	height: 32px;
 	padding: 8px;
 	margin-right: 6px;
-	background: #e2dd30;
+	background: #e2dddd;
 	fill: #fff;
 }
 
@@ -778,7 +778,7 @@ button:not(:-moz-focusring):focus > .menu__btn-title {
 .toc__menu a {
 	display: block;
 	padding: 5px 10px;
-	color: #e2dd30;
+	color: #e2dddd;
 	border-bottom: 1px solid #ebebeb;
 }
 
@@ -861,7 +861,7 @@ button:not(:-moz-focusring):focus > .menu__btn-title {
 .pagination__item:hover,
 .pagination__item--current {
 	color: #fff;
-	background: #e2dd30;
+	background: #e2dddd;
 }
 
 /* Post Navigation */
@@ -983,7 +983,7 @@ input[type=reset] {
 
 input[type=submit]:hover,
 input[type=reset]:hover {
-	background: #e2dd30;
+	background: #e2dddd;
 }
 
 textarea {
@@ -1012,7 +1012,7 @@ textarea {
 	font-size: 16px;
 	font-size: 1rem;
 	text-transform: uppercase;
-	border-bottom: 3px solid #e2dd30;
+	border-bottom: 3px solid #e2dddd;
 }
 
 .widget__item {
@@ -1092,7 +1092,7 @@ textarea {
 
 .widget-languages__link:hover .widget-languages__link-btn {
 	color: #fff;
-	background: #e2dd30;
+	background: #e2dddd;
 }
 
 .widget-languages__link-btn {
