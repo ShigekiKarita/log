@@ -21,9 +21,10 @@
 
 *** FILCO Majestouch MINILA
 
-[[file:./minila.jpg]]
+<a target="_blank"  href="https://www.amazon.co.jp/gp/product/B00F3U0B0G/ref=as_li_tl?ie=UTF8&camp=247&creative=1211&creativeASIN=B00F3U0B0G&linkCode=as2&tag=log040-22&linkId=f841b86a4e653c22e4e8dec1658eb44e"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=JP&ASIN=B00F3U0B0G&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=log040-22" ></a><img src="//ir-jp.amazon-adsystem.com/e/ir?t=log040-22&l=am2&o=9&a=B00F3U0B0G" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 
-> [[https://www.diatec.co.jp/products/det.php?prod_c=1316]]
+# [[file:./minila.jpg]]
+
 
 青軸
 
@@ -50,9 +51,9 @@ Mejestouchに共通する個性としては，とにかく楽しいです．キ�
 
 *** 東プレ Realforce 91UDK-G 
 
-[[file:./realforce.jpg]]
+# [[file:./realforce.jpg]]
 
-> [[https://www.diatec.co.jp/shop/det.php?prod_c=588]]
+<a target="_blank"  href="https://www.amazon.co.jp/gp/product/B001LK9E7S/ref=as_li_tl?ie=UTF8&camp=247&creative=1211&creativeASIN=B001LK9E7S&linkCode=as2&tag=log040-22&linkId=10db106f8003c11f2407ceca8c7107e8"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=JP&ASIN=B001LK9E7S&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=log040-22" ></a><img src="//ir-jp.amazon-adsystem.com/e/ir?t=log040-22&l=am2&o=9&a=B001LK9E7S" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
 
 - 総合 2.25
 - 静音性 4
@@ -64,9 +65,10 @@ Realforceの良いところはMejestouchと違ってシットリした質感で�
 
 *** PFU Happy Hacking Keyboard Professional JP
 
-[[file:./hhkb.jpg]]
+# [[file:./hhkb.jpg]]
 
-> [[https://www.pfu.fujitsu.com/hhkeyboard/hhkbprojp/]]
+<a target="_blank"  href="https://www.amazon.co.jp/gp/product/B001KWJTD6/ref=as_li_tl?ie=UTF8&camp=247&creative=1211&creativeASIN=B001KWJTD6&linkCode=as2&tag=log040-22&linkId=f5a5b942536fcef893a035262aac43b4"><img border="0" src="//ws-fe.amazon-adsystem.com/widgets/q?_encoding=UTF8&MarketPlace=JP&ASIN=B001KWJTD6&ServiceVersion=20070822&ID=AsinImage&WS=1&Format=_SL250_&tag=log040-22" ></a><img src="//ir-jp.amazon-adsystem.com/e/ir?t=log040-22&l=am2&o=9&a=B001KWJTD6" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+
 
 - 総合 4.00
 - 静音性 4
