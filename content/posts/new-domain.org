@@ -36,7 +36,7 @@ s.karita.xyz A 0 185.199.111.153
 
 最後にgithubリポジトリのルートに [[https://github.com/ShigekiKarita/shigekikarita.github.io/blob/master/CNAME][CNAME というファイル]] をつくるときちんとIPアドレスから個人サイトへする
 #+BEGIN_SRC txt
-s.karita.xyz
+karita.xyz
 #+END_SRC
 なんとgithub.ioからリダイレクトもしてくれるので特に昔のリンクを修正する必要もなくて便利です．
 
@@ -56,21 +56,19 @@ s.karita.xyz
 などを入力しながら進むと最初のDNSレコード編集を別タブで開いて指示に従って ~(なんかの文字列).www.karita.xyz TXT (なんかの文字列)~ を設定すると完了．
 もしかすると時間差でブラウザから https アクセスすると警告がでるかもしれないけど1時間くらい待つと反映される気がする．
 
-** karita.xyz への転送
+** s.karita.xyz から karita.xyz への転送
 
-(www.)karita.xyz に shigekikarita.github.io を貼りたいんですが，うまくいかない...と思っていたら，そもそもDNSレコードでは設定できないようになっている??ちなみに下記ページで紹介されている *ワイルドカードだと誰でもサブドメイン使えるのでやばい* という話が github pages にあるので絶対やめましょう．
+s.karita.xyz じゃなくて (www.)karita.xyz に shigekikarita.github.io を貼りたいんですが，うまくいかない...と思っていたら，そもそもDNSレコードでは設定できないようになっている??ちなみに下記ページで紹介されているワイルドカードで回避する方法は *誰でもサブドメイン使えるのでやばい* という話が github pages にあるので絶対やめましょう．
 
-[[https://www.softel.co.jp/blogs/tech/archives/5638]] 
-
+- できない説 [[https://www.softel.co.jp/blogs/tech/archives/5638]] 
+- ワイルドカードやめたほうが良い説 [[https://help.github.com/en/articles/setting-up-a-www-subdomain#configuring-a-cname-record-with-your-dns-provider]]
 #+BEGIN_QUOTE
 Danger: Do not use wildcard DNS records (e.g. *.example.com) with GitHub Pages! A wildcard DNS record will allow anyone to host a GitHub Pages site at one of your subdomains.
 #+END_QUOTE
 
-[[https://help.github.com/en/articles/setting-up-a-www-subdomain#configuring-a-cname-record-with-your-dns-provider]]
-
 スタードメインにおけるやり方としては [[https://secure.netowl.jp/star-domain/]] 管理ページから無料サーバを借りて，もう一度同ページを開き，サーバ管理ツール > サイト転送設定 > サイト転送追加 から下記のように設定しました．
 
-- 転送元パス http://karita.xyz/ 空欄
-- 転送先URL https://s.karita.xyz
+- 転送元パス http://karita.xyz/ (空欄)
+- 転送先URL (https://s.karita.xyz)
 
 全部雰囲気でやっているので，記録しておかないともう二度と同じように設定出来る気がしない．間違っていたらぜひ教えてください...
