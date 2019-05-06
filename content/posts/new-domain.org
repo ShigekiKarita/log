@@ -2,7 +2,7 @@
 #+summary:
 #+categories: Info
 #+tags: DNS gh-pages
-#+draft: true
+#+draft: false
 #+date: 2019-05-06T22:28:52+09:00
 #+author: Shigeki Karita
 #+isCJKLanguage: true
