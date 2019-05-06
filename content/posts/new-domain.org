@@ -1,0 +1,48 @@
+#+title: 独自ドメイン取得した
+#+summary:
+#+categories: Info
+#+tags: DNS gh-pages
+#+draft: true
+#+date: 2019-05-06T22:28:52+09:00
+#+author: Shigeki Karita
+#+isCJKLanguage: true
+#+markup: org
+#+toc: false
+
+** tl;dr
+
+新HP [[http://s.karita.xyz]]
+
+新日記 (このページ) [[http://s.karita.xyz/log]]
+
+** 経緯 (how to)
+
+スタードメインで .xyz ドメインが 1 円で売ってたので karita.xyz を取得した．翌年は1600円くらいかかるけど，何事も経験ということで．
+
+[[https://secure.netowl.jp/star-domain/]]
+
+上記の管理ページから，管理ドメイン一覧 > 対象のドメイン > ドメイン管理ツール > DNSレコード編集 > レコード一括編集 から設定 github pages のリンクなどを設定できる．
+
+CNAME でやる方法は時間かかるのか，なんなのか上手くいかず A で設定した．こんな感じで...
+
+#+BEGIN_SRC dns
+s.karita.xyz A 0 185.199.108.153
+s.karita.xyz A 0 185.199.109.153
+s.karita.xyz A 0 185.199.110.153
+s.karita.xyz A 0 185.199.111.153
+#+END_SRC
+
+https://help.github.com/en/articles/setting-up-an-apex-domain#configuring-a-records-with-your-dns-provider
+
+そんでgithubリポジトリのルートに [[https://github.com/ShigekiKarita/shigekikarita.github.io/blob/master/CNAME][CNAME というファイル]] をつくるときちんとIPアドレスから個人サイトへする
+#+BEGIN_SRC txt
+s.karita.xyz
+#+END_SRC
+なんとgithub.ioからリダイレクトもしてくれるので特に昔のリンクを修正する必要もなくて便利です．
+
+** To do
+
+(www.)karita.xyz に shigekikarita.github.io を貼りたいんですが，うまくいかない...orz
+
+Let's Encrypt を使って証明書をつくったりしたけど，設定がややこしくてまだできてないです...orz
+
