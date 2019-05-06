@@ -11,9 +11,9 @@
 
 ** tl;dr
 
-新HP [[http://s.karita.xyz]]
+新HP [[https://s.karita.xyz]]
 
-新日記 (このページ) [[http://s.karita.xyz/log]]
+新日記 (このページ) [[https://s.karita.xyz/log]]
 
 ** 経緯 (how to)
 
@@ -21,7 +21,7 @@
 
 [[https://secure.netowl.jp/star-domain/]]
 
-上記の管理ページから，管理ドメイン一覧 > 対象のドメイン > ドメイン管理ツール > DNSレコード編集 > レコード一括編集 から設定 github pages のリンクなどを設定できる．
+上記の管理ページから， ドメイン管理ツール > DNSレコード編集 > レコード一括編集 から設定 github pages のリンクなどを設定できる．
 
 CNAME でやる方法は時間かかるのか，なんなのか上手くいかず A で設定した．こんな感じで...
 
@@ -40,9 +40,24 @@ s.karita.xyz
 #+END_SRC
 なんとgithub.ioからリダイレクトもしてくれるので特に昔のリンクを修正する必要もなくて便利です．
 
+** Let's encrypt 証明書
+
+[[https://secure.netowl.jp/sslbox/]]
+
+上記の管理ページから 新規取得 > 他社サーバ > Let's Encrypt を選択
+
+- コモンネーム: www.karita.xyz
+- 国(country): JP
+- 都道府県(state): Osaka
+- 市町村(local): Osaka
+- 組織(org): None
+- 部署(unit): None
+
+などを入力しながら進むと最初のDNSレコード編集を別タブで開いて指示に従って ~(なんかの文字列).www.karita.xyz TXT (なんかの文字列)~ を設定すると完了．
+もしかすると時間差でブラウザから https アクセスすると警告がでるかもしれないけど1時間くらい待つと反映される気がする．
+
 ** To do
 
 (www.)karita.xyz に shigekikarita.github.io を貼りたいんですが，うまくいかない...orz
 
-Let's Encrypt を使って証明書をつくったりしたけど，設定がややこしくてまだできてないです...orz
 
