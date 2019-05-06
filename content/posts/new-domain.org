@@ -32,9 +32,9 @@ s.karita.xyz A 0 185.199.110.153
 s.karita.xyz A 0 185.199.111.153
 #+END_SRC
 
-https://help.github.com/en/articles/setting-up-an-apex-domain#configuring-a-records-with-your-dns-provider
+詳しくは [[https://help.github.com/en/articles/setting-up-an-apex-domain#configuring-a-records-with-your-dns-provider][こちら]]
 
-そんでgithubリポジトリのルートに [[https://github.com/ShigekiKarita/shigekikarita.github.io/blob/master/CNAME][CNAME というファイル]] をつくるときちんとIPアドレスから個人サイトへする
+最後にgithubリポジトリのルートに [[https://github.com/ShigekiKarita/shigekikarita.github.io/blob/master/CNAME][CNAME というファイル]] をつくるときちんとIPアドレスから個人サイトへする
 #+BEGIN_SRC txt
 s.karita.xyz
 #+END_SRC
