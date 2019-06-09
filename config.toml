@@ -17,7 +17,7 @@ pygmentsCodefences=true
 
   [[menu.main]]
     identifier = "root"
-    name = "karitech"
+    name = "home"
     pre = "<i class='fa fa-heart'></i>"
     url = "https://shigekikarita.github.io"
     weight = -110
@@ -37,7 +37,7 @@ pygmentsCodefences=true
 [Params]
   subtitle = "" # Subtitle of your site. Used in site header
   description = "personal blog about everything" # Site description. Used in meta description
-  copyright = "karitech" # copyright holder, otherwise will use site title
+  copyright = "karita" # copyright holder, otherwise will use site title
   opengraph = true # Enable OpenGraph if true
   twitter_cards = true # Enable Twitter Cards if true
   readmore = true # Show "Read more" button in list if true
