@@ -1,0 +1,71 @@
+#+title: スマホでコーディング
+#+summary:
+#+categories: Programming
+#+tags: Android D
+#+draft: false
+#+date: 2019-06-24
+#+author: Shigeki Karita
+#+isCJKLanguage: true
+#+markup: org
+#+toc: false
+
+正気を失ったかと思われるかもしれませんが，Andridスマホを屋外での開発マシンにしようと思いました．夏になるとノートPCを背負って移動が嫌なので．．．
+
+** ハードウェア
+
+[[file:./front.jpg]]
+
++ LG Nexus 5X
++ iClever IC-03BK
++ ELECOM CAPCLIP
++ DAISO リング型のスマホスタンド x 2
++ DAISO プラスチック用両面テープ
+
+最後のDAISOリングは便利で，縦に置くとき一個だと頼りないので二個にしてさらにプラスチック用の両面テープを使って接着力を補いました．この位置につけると横向きにしたときも立てることができます．
+
+[[file:./back.jpg]]
+
+マウスとキーボードはAmazonで購入．とにかく小さいやつが欲しかったのです．たたむとポケットに入るくらい小さくなります．
+
+[[file:./fold.jpg]]
+
+キーボードの打ち心地は我慢できるレベルですが，US配列は未だに慣れません．Caps/CTRL入替は親指CTRLというアプリでできました．
+
+あと別の方向性として，本格的なキーボードにスマホを搭載するというアイデアもあります．
+
+[[https://twitter.com/kari_tech/status/1142718276650143745]]
+
+** リモートの開発環境
+
+さすがにスマホは一時的な環境として，同期も面倒だしGPUは積んでないので，自宅マシンに接続して開発することにしました．そのためのルータのポート開放とかDDNS設定した(この辺は素人知識でやるとセキュリティ的に不味そうなので手順は省略)．
+
+スマホからのSSH接続はJuiceSSHというアプリを Google Play で入れました．すごく快適！
+
+
+** ローカルの開発環境
+
+リモートに接続不要な作業はローカルでやろうと思い，Termux というアプリを Google Play で入れました．とりあえずD言語が書ければいいので，こんな感じでpkg (apt由来っぽい) いれました．これで全部揃う．ちなみにDMDとかGDCは登録されてなかった．
+
+#+BEGIN_SRC bash
+$ pkg install ldc git emacs tmux
+$ termux-setup-storage
+#+END_SRC
+
+二行目はストレージのアクセス権を取得します． ~$HOME/storage~ 以下に download などのフォルダがでてきますが，root化していないのでOS用の領域など全て見れるわけではないですが，便利．
+
+** Emacs 便利なショートカット
+
+とりあえず，Emacsで全てをやっているのですが，やはりどんな環境でも動くのがすごい．SSHもtramp使える．まだ少ないけど，使いながらここにメモを書き足していく予定．
+
+全体．US配列はじめての人なので...．
+
++ ~C-/~ これundoだったんですね． ~C-_~ 派でしたがUSだとうちにくいので．
++ ~M-x~ メタキー全般なんですが，光りのはやさで入力しないとAndroidの絵文字パレットがでてくる，それはそれで便利ですが
+
+IME関連．とりあえず日本語入力はEmacsに頼る．
+
++ ~C-\~ EmacsのIMEを起動
++ IMEモードで ~qq~ ローマ字入力切替
++ IMEモードで ~K~ カタカナ変換
+
+他のIME挙動: [[http://www.ice.gunma-ct.ac.jp/~mame/kougi/kisoron/japanese.html]]
