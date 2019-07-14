@@ -73,7 +73,7 @@ make -f posix.mak -j style unittest-debug
 
 *** バグの場合は bugzilla に登録．恐らく自動でchangelogに反映される
 
-私は雑にPRしてしまいましたが，一度Bugzillaを見て報告されていないか見ましょう．なければ新たに再現コードを貼って登録するだけで良いようです．誰かが二度修正するのを防げますし，PRタイトルやcommit logで "Fix Issue XXXX" と残すと自動でchangelogに反映されて，管理者や開発者の皆さんの手間が減るそうです．PRタイトルだとmergeされたときのcommit messageで反映されるっぽいです．
+私は雑にPRしてしまいましたが，一度Bugzillaを見て報告されていないか見ましょう．なければ新たに再現コードを貼って登録するだけで良いようです．誰かが二度修正するのを防げますし，PRタイトルやcommit logで "Fix Issue XXXX" と残すと自動でchangelogに反映されて，管理者や開発者の皆さんの手間が減るそうです．
 
 *** regression testを書く
 
