@@ -19,7 +19,7 @@
 
 ** 直した object.destroy のバグ
 
-object.destroy にオブジェクトを渡すとすぐそのデストラクタを呼び，初期化する関数です．最近消えた delete 関数の代わりに使うことが一般的になりました．ちなみに nogc で動くので nothrow さえ保証できればD言語のクラスによる設計をC/C++並みに幅広い環境で使うことができます．
+object.destroy はオブジェクトを渡すとすぐそのデストラクタを呼び，初期化する関数です．最近消えた delete 関数の代わりに使うことが一般的になりました．ちなみに nogc で動くので nothrow さえ保証できればD言語のクラスによる設計をC/C++並みに幅広い環境で使うことができます．
 
 私の場合は [[https://github.com/ShigekiKarita/grain2/][grain2]] というライブラリを作っていて，mir-algorithmの参照カウンタを使い，nogcかつnothrowに実装しているのですが，このコードが動かないことがわかりました．
 #+BEGIN_SRC d
