@@ -1,0 +1,24 @@
+#+title: grain2: nogc 実装
+#+summary:
+#+categories: uncategorized
+#+tags:
+#+draft: true
+#+date: 2019-06-30T18:15:17+09:00
+#+author: Shigeki Karita
+#+isCJKLanguage: true
+#+markup: org
+#+toc: false
+
+趣味で grain というD言語のtensorflowみたいなライブラリを作っているのですが，やりたいことが既存のコードベースとかけはなれてきたので，一からgrain2として再出発しようと思います．私の中のTODO listというのは
+
+- nogc 対応．C++で書かれるリアルタイム処理のプラグイン(VSTとか?)とかで使いたい
+- JIT コンパイル．せっかくコンパイル時処理とか静的なチェックとかを充実した言語なので，静的な計算グラフを作れるようにしたい
+- Open CL対応．これはどこまで出来るかわからないけど，OpenCLじゃなくても[[https://github.com/ROCm-Developer-Tools/HIP][HIP]]のがいいかも
+
+今回は grain2 を作る上でいくつか上記機能をそれぞれプロトタイプしていこうと思います．
+
+** nogc 実装
+
+簡単にCPU側で簡単な多層パーセプトロン(MLP)を自動微分してみましょう．
+
+** reference

@@ -1,0 +1,111 @@
+#+title: D言語(druntime)に初めて貢献した
+#+summary:
+#+categories: uncategorized
+#+tags:
+#+draft: false
+#+date: 2019-07-14T18:33:18+09:00
+#+author: Shigeki Karita
+#+isCJKLanguage: true
+#+markup: org
+#+toc: false
+
+** tl;dr
+
+- mir-algorithm を触っていたら D 言語の [[https://dlang.org/library/object/destroy.html][object.destroy]] が nothrow じゃないことに気づきPR
+- nothrow でクラスオブジェクトを破棄できるようになる
+- 初めてPR 送るなら，[[https://wiki.dlang.org/Starting_as_a_Contributor][このリンク先]]を読もう
+
+送ったPR:  [[https://github.com/dlang/druntime/pull/2674]]
+
+** 直した object.destroy のバグ
+
+object.destroy にオブジェクトを渡すとすぐそのデストラクタを呼び，初期化する関数です．最近消えた delete 関数の代わりに使うことが一般的になりました．ちなみに nogc で動くので nothrow さえ保証できればD言語のクラスによる設計をC/C++並みに幅広い環境で使うことができます．
+
+私の場合は [[https://github.com/ShigekiKarita/grain2/][grain2]] というライブラリを作っていて，mir-algorithmの参照カウンタを使い，nogcかつnothrowに実装しているのですが，このコードが動かないことがわかりました．
+#+BEGIN_SRC d
+nothrow unittest
+{
+    class C
+    {
+        static int dtorCount = 0;
+        this() nothrow {}
+        ~this() nothrow { dtorCount++; }
+    }
+
+    auto c = new C;
+    destroy(c); // こいつがnothrowじゃないのでコンパイルエラー
+    assert(C.dtorCount == 1);
+}
+#+END_SRC
+普通は明示的にdestroyを呼ぶシーンは少ないと思います (リソース節約のために積極的に書いてもいいと思います)．RAIIはdestroyは使わないし，これまで destroy がなければnothrowで通っていたので，気づく機会もなかったのかなと思います．
+
+修正自体は ~object.d~ 内の ~rt_finalize~ の前方宣言に ~nothrow~ つけるだけで誰でもできるものでしたが，みなさんに色々手引してもらい申し訳なかったので，ここに書き留めて次回に活かします．
+
+** 手元で修正・テスト
+
+D言語はコンパイラ，ランタイム，標準ライブラリ他が別リポジトリで管理されていて環境構築がしんどいのですが， [[https://github.com/CyberShadow/Digger][Digger]] を使うと楽です．
+#+BEGIN_SRC bash
+# あんまり新しいDMDだと digger がビルドできない，テストするDMDとは別なのでOK
+source "$(curl -fsS  --retry 3 https://dlang.org/install.sh | bash -s dmd-2.084.0 --activate)"
+dub fetch digger
+dub run digger -- checkout "stable"  # デフォルトは master
+dub run digger -- rebuild
+
+# 今回は druntime だけ修正する． digger test は全部のリポジトリをテストするので長い
+cd ./work/repo/druntime
+make -f posix.mak -j style unittest-debug
+#+END_SRC
+当然，最後のディレクトリはgit cloneしたリポジトリなので，自分のforkしたリポジトリで適当にbranchを切ってテストや修正をcommit/pushするとPRが作れるようになります．全体のテストはCIに任せました．
+
+** PRを送る
+
+とりあえず今回わかったのは，PR送る時は以下の3つに気をつけたい
+
+1. 破壊的変更でなければ master ではなく stable ブランチ
+1. バグの場合は [[https://issues.dlang.org][Bugzilla]] に登録．PRのタイトルに "Fix issue XXXX - title"
+1. 修正を確認 + 再発させないために regression test (unittestなど) を書く，Bugzilla id も忘れず
+
+その他の細かいことはWikiの [[https://wiki.dlang.org/Starting_as_a_Contributor][Starting as a Contributor]] を読みましょう．全部書いてあります，私は読んでいなかった..．英語読める人は私の記事ではなくWikiを読んでください．
+
+*** 破壊的変更でなければ master ではなく stable ブランチ
+
+何も読まずに普通にmasterに送ってしまった．stableにPRのターゲットを変更するとmasterのcommitが入ってしまうので, PR用のブランチで ~git rebase --onto stable master~ としました．push済みの場合は，歴史改変なので ~git push --force~ が必要．この辺も[[https://wiki.dlang.org/Starting_as_a_Contributor#Stable_Branch][Wiki]]に書いてあるので読みましょう．
+
+*** バグの場合は bugzilla に登録．恐らく自動でchangelogに反映される
+
+私は雑にPRしてしまいましたが，一度Bugzillaを見て報告されていないか見ましょう．なければ新たに再現コードを貼って登録するだけで良いようです．誰かが二度修正するのを防げますし，PRタイトルやcommit logで "Fix Issue XXXX" と残すと自動でchangelogに反映されて，管理者や開発者の皆さんの手間が減るそうです．PRタイトルだとmergeされたときのcommit messageで反映されるっぽいです．
+
+*** regression testを書く
+
+簡単に unittest が書ける場合は修正したコードの近くに unittest を書きます．unittestでチェックできないことを確かめたい時は， ~test/~ 以下にいろいろな例があるのでそこに再現スクリプトを追加してMakefileにビルドを追記します．いずれにせよテストにはコメントでBugzillaのIDを書く必要があります．自明だと思っても二度と再発しないようにテストを書きましょう．独自のCIもあり面白い
+
+- appveyor: windows上でのテスト
+- circleci: linux (ubuntu18.04) 上でのテスト
+- buildkite: 主要なDUB上のパッケージをテスト(?)
+- [[https://forum.dlang.org/post/ytvvhpzyyoqxarizyqqe@beta.forum.dlang.org][DAutoTest]]: 独自のドキュメントビルドCI
+- [[https://auto-tester.puremagic.com/][autotestor]]: 独自のCI．全ツールをWin/Linux/Darwin/FreeBSDの32/64bit環境でテストしている，一番重い
+
+** workaround
+
+今回の修正は stable ブランチにマージされるので，すぐ使えるようになると思いますが，古いD言語環境のために[[https://github.com/libmir/mir-algorithm/issues/208][mir-algorithmの作者に教えてもらった回避方法]]を紹介します．destroyは2つの挙動があり，D言語オブジェクトなら問題の ~rt_finalize~ を C++ オブジェクトなら別の方法でデストラクタを呼びます．後者はすでに nothrow なのでデストラクタを持つ型はC++にしておいて中身はD言語にするのが回避策です．
+#+BEGIN_SRC d
+nothrow unittest
+{
+    extern (C++) class C
+    {
+        extern (D):
+        static int dtorCount = 0;
+        this() nothrow {}
+        ~this() nothrow { dtorCount++; }
+    }
+
+    auto c = new C;
+    destroy(c); // destroy が C++ 用の処理に入るので nothrow
+    assert(C.dtorCount == 1);
+}
+#+END_SRC
+さきほどの例だとこんな感じで回避できます
+
+** おわりに
+
+思ったよりハードル低かったので，また懲りずに[[https://issues.dlang.org/describecomponents.cgi?product=D][Bugzilla]]眺めてPRしたいです
