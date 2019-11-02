@@ -84,7 +84,9 @@ Dは構造体とクラスがbit copyによってコピー可能と仮定して�
 ** よりシンプルなオブジェクトモデル
 
 C++は多重継承があり[[https://www.amazon.co.jp/Inside-Object-Model-Stanley-Lippman/dp/0201834545][複雑なオブジェクトモデル]]となる。
-~alias this~ を使えば多重継承は絶対に一度も必要にならない。
+ ~alias this~ を使えば多重継承は絶対に一度も必要にならない。
+
+(訳注: ~alias this~ に関しては同氏の解説がくわしい [[http://p0nce.github.io/d-idioms/#Extend-a-struct-with-alias-this]])
 
 ** 合理化されたオペレータオーバーロード
 
