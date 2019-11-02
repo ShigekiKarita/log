@@ -31,7 +31,7 @@ Dはプリプロセッサが不要。
 
 ** No more ヘッダーファイル
 
-たとえC++がmoduleを実装し、ついに利用できるようになろうと(訳注: C++20のこと)、後方互換のためにヘッダーファイルはモジュールと共存し続けるだろう。
+たとえC++がmoduleを実装し、利用できるようになろうと、後方互換のためにヘッダーファイルは共存し続けるだろう。
 
 (訳注: C++20ではついにmoduleが正式採用された、Piolat氏の指摘通り [[https://eel.is/c++draft/module.global.frag#nt:global-module-fragment][global module fragment]] のようなヘッダーを使う後方互換のための機能も入ったりした。)
 
