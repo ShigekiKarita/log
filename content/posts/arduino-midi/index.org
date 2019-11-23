@@ -75,12 +75,12 @@ void loop() {
 
 ** MIDI デバイスファームウェア
 
-ここが一番ややこしいのですが、Arduinoデバイスとして認識してスケッチを書き込むときと、MIDIデバイスとして認識してほしいときの二つの状態がある。
+ここが一番ややこしいのですが、Arduinoデバイスとして認識してIDEからコードを書き込むときと、MIDIデバイスとして認識してほしいときの二つの状態がある。
 ファームウェアを書き込むDFUモードはPC接続の直前にUSB端子近くのピン(下記画像のRESET, GND)を短絡させているかどうかで切り替えられる。短絡させるのは適当にクリップとか手で押さえていても良い。起動したら手を放さないと認識してくれない。
 
 [[file:./short.png]]
 
-まずMIDIデバイス用のファームウェアを書き換えるソフト dfu-programmer (Win/Mac/Linuxなんでも動きそう) をインストールする。その後、ファームウェアをかきこむ。
+うまくDFUモードで起動したら、まずMIDIデバイス用のファームウェアを書き換えるソフト dfu-programmer (Win/Mac/Linuxなんでも動きそう) をインストールする。その後、ファームウェアをかきこむ。
 
 - Windowsビルドされたdfu-programmer [[https://sourceforge.net/projects/dfu-programmer/files/dfu-programmer/0.7.2/dfu-programmer-win-0.7.2.zip/download]]
 - デフォルトのファームウェア [[https://github.com/arduino/ArduinoCore-avr/blob/master/firmwares/atmegaxxu2/arduino-usbserial/Arduino-usbserial-atmega16u2-Uno-Rev3.hex]]
@@ -93,10 +93,9 @@ void loop() {
 ./dfu-programmer.exe ATmega16U2 flash dualMoco.hex
 ./dfu-programmer.exe ATmega16U2 reset
 #+END_SRC
-
-ファームウェアをデフォルトに戻すときは ~dualMoco.hex~ ではなく ~Arduino-usbserial-atmega16u2-Uno-Rev3.hex~ を flash します。
 ~MocoLufa~ といった MIDI デバイスが DTM ソフトやデバイスマネジャーから見えれば成功。
 
+コードを修正したいなどファームウェアをデフォルトに戻すときは ~dualMoco.hex~ ではなく ~Arduino-usbserial-atmega16u2-Uno-Rev3.hex~ を flash します。
 
 ** 動作検証
 
