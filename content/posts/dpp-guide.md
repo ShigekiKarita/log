@@ -4,7 +4,7 @@ summary: ""
 categories: ["Programming", "D"]
 tags: ["D"]
 draft: false
-date: 2019-12-16T00:00:00+09:00
+date: 2019-12-15T00:00:00+09:00
 author: "Shigeki Karita"
 isCJKLanguage: true
 markup: "md"
