@@ -136,12 +136,13 @@ OpenCL 2.1 NEO
 }
 ```
 
-以下のコマンドで私の用意したプロジェクトがビルド出来るはずです
+以下のコマンドで私の用意したプロジェクトがビルド出来るはずです．ちなみにこの例では，ベクトルの足し算をGPU上で行う少し長めのコードになっています．
 
 ```bash
 $ git clone https://github.com/ShigekiKarita/dpp-opencl
 $ cd dpp-opencl
 $ dub run --compiler=ldc2
+SUCCESS!!
 ```
 
 プロジェクトはGitHubに公開してます https://github.com/ShigekiKarita/dpp-opencl
