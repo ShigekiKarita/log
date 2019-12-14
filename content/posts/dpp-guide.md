@@ -146,5 +146,8 @@ $ dub run --compiler=ldc2
 
 プロジェクトはGitHubに公開してます https://github.com/ShigekiKarita/dpp-opencl
 
+## おわりに
+
+私自身，日々 dpp にお世話になっています．たとえば今回紹介した OpenCL だけでなく CUDA のヘッダーなども完璧に動きます．個人的には半年前に OpenCL の SIMD 宣言の翻訳が変というマイナーすぎるバグを報告してみたら，ものすごい速さで fix してもらった経験があり，大変感謝しています．
 
 それでは皆さん，より一層快適なD言語生活を!
