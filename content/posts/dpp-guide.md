@@ -3,7 +3,7 @@ title: "dppでC/C++ライブラリを自動でD言語にbindして使う"
 summary: ""
 categories: ["Programming", "D"]
 tags: ["D"]
-draft: true
+draft: false
 date: 2019-12-15T00:00:00+09:00
 author: "Shigeki Karita"
 isCJKLanguage: true
