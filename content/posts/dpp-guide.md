@@ -1,5 +1,5 @@
 ---
-title: "dppでC/C++ライブラリを自動でD言語にbindして使う"
+title: "dpp: C/C++ライブラリをD言語から楽に使う"
 summary: ""
 categories: ["Programming", "D"]
 tags: ["D"]
@@ -14,19 +14,19 @@ markup: "md"
 
 ## はじめに
 
-筆者は常々，D言語の唯一(?)の欠点はコミュニティの小ささ ≒ ライブラリの少なさだと思っていました．しかし今や，dpp の登場で C/C++ コミュニティのライブラリを全自動で再利用できるため，人気の言語に負けないクラスの財産を得たのです．とくに C/C++ の財産を抱える読者にとって，この記事はD言語を始めるとても良い機会になるでしょう．
+筆者は常々，D言語の唯一(?)の欠点はコミュニティの小ささ ≒ ライブラリの少なさだと思っていました．しかし今やdppの登場で，莫大な C/C++ コミュニティのライブラリを全自動で再利用できるため，人気の言語に負けない規模の財産を得たのです．本記事はとくにC/C++から段階的に移行したい読者にとって，D言語を始める良い機会になればと思います．
 
 ## D言語と C/C++ の互換性
 
 D言語にはCおよびC++(!!)との互換性があるので， `extern (C)` または `extern (C++)` で修飾子した型や関数を宣言(bind)して，ビルド済みのC/C++ライブラリをリンクすれば自由に呼び出すことが可能です．
 
-- https://dlang.org/spec/interfaceToC.html
-- https://dlang.org/spec/cpp_interface.html
+- [Interfacing to C](https://dlang.org/spec/interfaceToC.html)
+- [Interfacing to C++](https://dlang.org/spec/cpp_interface.html)
 
 D言語の標準ライブラリ(ランタイム)にある `core.stdc` と `core.stdcpp` は，それぞれC/C++標準ライブラリをbindしています．最近では `std::vector` のような大作も入っています．
 
-- https://github.com/dlang/druntime/tree/master/src/core/stdc
-- https://github.com/dlang/druntime/tree/master/src/core/stdcpp
+- https://github.com/dlang/druntime/tree/v2.089.0/src/core/stdc
+- https://github.com/dlang/druntime/tree/v2.089.0/src/core/stdcpp
 
 ただし，bindを人手で書くので間違えたりするとリンクエラーになったり，巨大なライブラリだと記述量が多くて面倒です (人手で頑張っている [deimos](https://github.com/D-Programming-Deimos)や, [derelict](https://github.com/DerelictOrg)とその置き換えである[bindbc](https://github.com/BindBC) などのプロジェクトもあります)．
 
@@ -119,7 +119,7 @@ OpenCL 2.1 NEO
 
 - dub.json の `preBuildCommands` で dpp をインストールし・ヘッダーを自動生成
 - `libs` にリンクするライブラリを指定
-- (オプション) source 以外の場所に生成した場合 dub.json の sourcePaths/importPaths に追加
+- (オプション) source 以外の場所に生成した場合 dub.json の `sourcePaths` `importPaths` に追加
 
 ```dub.json
 {
