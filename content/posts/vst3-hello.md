@@ -45,9 +45,7 @@ cd "<解凍先>/VST SDK"
 mkdir build
 cd build
 cmake  -G "Visual Studio 16 2019" -A x64 ../VST3_SDK
-
-# VSを使ってビルド
-MSBuild.exe vstsdk.sln
+cmake --build . --parallel 10
 ```
 
 なお MSBuild.exe のログが日本語になって文字化けしていると思いますが、 `$ chcp 850` と打てば英語になってくれます。筆者の環境ではビルド完了まで1分ほどかかりました。
@@ -104,9 +102,7 @@ cmake -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF \
 	  -G "Visual Studio 16 2019" \
 	  -A x64 \
 	  "<解凍先>/VST_SDK/VST3_SDK"
-
-# VSを使ってビルド
-MSBuild.exe vstsdk.sln
+cmake --build . --parallel 10
 ```
 
 この例でもビルドに30秒かかるので、毎回新しいプラグインやファイル作るたびにSDKと全自作プラグインがビルドし直しなのは嫌ですね。ただし、モジュールのない時代のC++にビルド設定で深入りするのも面倒ですし、SDK側もそこそこな頻度でアップデートあるからそういうものかと無理やり納得しています。
@@ -130,7 +126,7 @@ cmake -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF \
 	  -G "Visual Studio 16 2019" \
 	  -A x64 \
 	  "<解凍先>/VST_SDK/VST3_SDK"
-MSBuild.exe vstsdk.sln
+cmake --build . --parallel 10
 ./bin/Debug/validator.exe ./VST3/Debug/vst1.vst3
 
 cd ../myVSTs
@@ -138,13 +134,7 @@ cd ../myVSTs
 # 2つ目のVST (SDK、1つ目はビルドされずに使い回す)
 ./vst3-tools/init-plugin.sh Vst2
 cd ../build
-cmake -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF \
-      -DSMTG_ADD_VST3_HOSTING_SAMPLES=OFF \
-	  -DSMTG_MYPLUGINS_SRC_PATH=../myVSTs \
-	  -G "Visual Studio 16 2019" \
-	  -A x64 \
-	  "<解凍先>/VST_SDK/VST3_SDK"
-MSBuild.exe vstsdk.sln
+cmake --build . --parallel 10
 ./bin/Debug/validator.exe ./VST3/Debug/vst2.vst3
 ```
 
