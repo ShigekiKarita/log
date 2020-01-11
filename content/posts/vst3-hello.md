@@ -3,7 +3,7 @@ title: "Windows CUI環境における VST3 開発"
 summary: ""
 categories: ["VST3", "C++"]
 tags: ["VST3"]
-draft: true
+draft: false
 date: 2020-01-12T02:24:12+09:00
 author: "Shigeki Karita"
 isCJKLanguage: true
