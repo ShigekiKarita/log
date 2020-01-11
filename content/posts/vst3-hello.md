@@ -116,15 +116,14 @@ MSBuild.exe vstsdk.sln
 上記のビルド問題が嫌なので実験として下記のようにbuildディレクトリを消さずに、使いまわして新しくプロジェクトを追加したところ、普通に動くことがわかった。CMakeもVSのキャッシュもよくわかっていないので気持ち悪いけど、とりあえずこれで...。
 
 ```bash
+mkdir build
 mkdir myVSTs
 cd myVSTs
 git clone --recursive https://github.com/ShigekiKarita/vst3-tools
 
-# １つ目 (SDKもビルドされる)
+# 1つ目のVST (SDKもビルドされる)
 ./vst3-tools/init-plugin.sh Vst1
-cd ..
-mkdir build
-cd build
+cd ../build
 cmake -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF \
       -DSMTG_ADD_VST3_HOSTING_SAMPLES=OFF \
 	  -DSMTG_MYPLUGINS_SRC_PATH=../myVSTs \
@@ -136,8 +135,9 @@ MSBuild.exe vstsdk.sln
 
 cd ../myVSTs
 
-# 2つ目 (SDK、1つ目はビルドされずに使い回す)
+# 2つ目のVST (SDK、1つ目はビルドされずに使い回す)
 ./vst3-tools/init-plugin.sh Vst2
+cd ../build
 cmake -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF \
       -DSMTG_ADD_VST3_HOSTING_SAMPLES=OFF \
 	  -DSMTG_MYPLUGINS_SRC_PATH=../myVSTs \
@@ -145,7 +145,7 @@ cmake -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF \
 	  -A x64 \
 	  "<解凍先>/VST_SDK/VST3_SDK"
 MSBuild.exe vstsdk.sln
-./bin/Debug/validator.exe ./VST3/Debug/vst1.vst3
+./bin/Debug/validator.exe ./VST3/Debug/vst2.vst3
 ```
 
 
