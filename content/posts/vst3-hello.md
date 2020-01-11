@@ -111,6 +111,45 @@ MSBuild.exe vstsdk.sln
 
 この例でもビルドに30秒かかるので、毎回新しいプラグインやファイル作るたびにSDKと全自作プラグインがビルドし直しなのは嫌ですね。ただし、モジュールのない時代のC++にビルド設定で深入りするのも面倒ですし、SDK側もそこそこな頻度でアップデートあるからそういうものかと無理やり納得しています。
 
+### 追記
+
+上記のビルド問題が嫌なので実験として下記のようにbuildディレクトリを消さずに、使いまわして新しくプロジェクトを追加したところ、普通に動くことがわかった。CMakeもVSのキャッシュもよくわかっていないので気持ち悪いけど、とりあえずこれで...。
+
+```bash
+mkdir myVSTs
+cd myVSTs
+git clone --recursive https://github.com/ShigekiKarita/vst3-tools
+
+# １つ目 (SDKもビルドされる)
+./vst3-tools/init-plugin.sh Vst1
+cd ..
+mkdir build
+cd build
+cmake -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF \
+      -DSMTG_ADD_VST3_HOSTING_SAMPLES=OFF \
+	  -DSMTG_MYPLUGINS_SRC_PATH=../myVSTs \
+	  -G "Visual Studio 16 2019" \
+	  -A x64 \
+	  "<解凍先>/VST_SDK/VST3_SDK"
+MSBuild.exe vstsdk.sln
+./bin/Debug/validator.exe ./VST3/Debug/vst1.vst3
+
+cd ../myVSTs
+
+# 2つ目 (SDK、1つ目はビルドされずに使い回す)
+./vst3-tools/init-plugin.sh Vst2
+cmake -DSMTG_ADD_VST3_PLUGINS_SAMPLES=OFF \
+      -DSMTG_ADD_VST3_HOSTING_SAMPLES=OFF \
+	  -DSMTG_MYPLUGINS_SRC_PATH=../myVSTs \
+	  -G "Visual Studio 16 2019" \
+	  -A x64 \
+	  "<解凍先>/VST_SDK/VST3_SDK"
+MSBuild.exe vstsdk.sln
+./bin/Debug/validator.exe ./VST3/Debug/vst1.vst3
+```
+
+
+
 ## おわりに
 
 今回は環境構築で力尽きましたが、次回は作りたかったMIDIエフェクト、もしくはdplugでのVST3出力をやっていこうと思います。
