@@ -12,7 +12,7 @@ markup: "md"
 
 あけましておめでとうございます、今年こそはWindowsにも慣れていこうと思います。
 
-今回はVST3開発環境構築と簡単なプロジェクトの作り方のメモです。私は以前、[Dplug](https://github.com/AuburnSounds/Dplug)を使って[D言語でVSTを作っていたとき](https://qiita.com/kari_tech/items/ef47d792b4aae047b42c)はVST2を使ってました。しかしVST2の開発サポートが終わってしまったので、そろそろVST3に移行したいです。具体的なゴールとしてはVST3で登場したMIDIエフェクトが作りたいです。まず仕組みを知るために、公式のC++から入ります。ちなみにDplugではすでにVST3が[サポート](https://github.com/AuburnSounds/Dplug/tree/master/vst3/dplug/vst3)されています。
+今回はVST3開発環境構築と簡単なプロジェクトの作り方のメモです。私は以前、[Dplug](https://github.com/AuburnSounds/Dplug)を使って[D言語でVSTを作っていたとき](https://qiita.com/kari_tech/items/ef47d792b4aae047b42c)はVST2を使ってました。しかしVST2の開発サポートが終わってしまったので、そろそろVST3に移行しようと考えていました。具体的なゴールとしてはVST3で登場したMIDIエフェクトが作りたいです。まず仕組みを知るために、公式のC++から入ります。ちなみにDplugではすでにVST3が[サポート](https://github.com/AuburnSounds/Dplug/tree/master/vst3/dplug/vst3)されています。
 
 問題点としては、いつもメインのWin開発環境はMSYS2なのでgccを使いたいのですが、CMakeのスクリプトやC++のプリプロセッサなどを見る限りWindowsではVS前提に書かれていました (`cmake -G "MSYS Makefiles"` で動くようにするのは、理解の浅い現時点ではハードルが高いです)。さらに私にとってネットによくあるVSとCMakeのGUIを使った開発が無理だったので、最低限シェル内で完結して開発する方法を模索しました。
 
@@ -23,18 +23,8 @@ markup: "md"
 全体のながれ
 
 - [CMake公式](https://cmake.org/download/)からビルド済みバイナリzipをDLしPATHを通す。ちなみにpacmanのcmakeはVSをサポートしてない
-- [Visual Studio 2019 Installer](https://visualstudio.microsoft.com/ja/thank-you-downloading-visual-studio/?sku=Community&rel=16) で "C++によるデスクトップ開発" > "MSVC v142" および "Windows 10 SDK" にチェックをいれてインストールします。これが最小構成
-- VS2019 でインストールされたMSBuild.exeとcl.exeにCMakeが見つけられるようPATHを通す
+- [Visual Studio 2019 Installer](https://visualstudio.microsoft.com/ja/thank-you-downloading-visual-studio/?sku=Community&rel=16) で "C++によるデスクトップ開発" > "MSVC v142" および "Windows 10 SDK" にチェックをいれてインストールします。これが最小構成かと
 - [VST3 Audio Plug-Ins SDK](https://www.steinberg.net/vst3sdk)をDLして、CUIからビルド
-
-PATHの通し方はこんな感じです。
-
-```bash
-VS_ROOT="/c/Program Files (x86)/Microsoft Visual Studio/2019/Community"
-export PATH="${VS_ROOT}/MSBuild/Current/Bin":$PATH
-export PATH="${VS_ROOT}/VC/Tools/MSVC/14.24.28314/bin/Hostx64/x64":$PATH
-export PATH=$HOME/Documents/cmake-3.16.2-win64-x64/bin:$PATH
-```
 
 最後にSDKをビルドします。versionは [3.6.14_build-24_2019-11-29](https://github.com/steinbergmedia/vst3sdk/commit/0908f475f52af56682321192d800ef25d1823dd2) でした。VST2と違ってVST3はgithubにあるのが良いですね。[公式ドキュメント](https://steinbergmedia.github.io/vst3_doc/vstinterfaces/cmakeUse.html)を参考にCUIからビルド:
 
@@ -48,7 +38,7 @@ cmake  -G "Visual Studio 16 2019" -A x64 ../VST3_SDK
 cmake --build . --parallel 10
 ```
 
-なお MSBuild.exe のログが日本語になって文字化けしていると思いますが、 `$ chcp 850` と打てば英語になってくれます。筆者の環境ではビルド完了まで1分ほどかかりました。
+なお MSBuild.exe のログが日本語になって文字化けしていると思いますが、 `$ chcp 850` と打てば英語になってくれます。筆者の環境ではビルド完了まで1分ほどかかりました。ちなみに`--parallel`がMSBuild.exeで効いていないような気がします...。
 
 ```bash
 # ビルドした検証ツールとVSTサンプルをテスト
@@ -137,8 +127,6 @@ cd ../build
 cmake --build . --parallel 10
 ./bin/Debug/validator.exe ./VST3/Debug/vst2.vst3
 ```
-
-
 
 ## おわりに
 
