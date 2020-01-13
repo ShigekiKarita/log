@@ -29,6 +29,7 @@ markup: "md"
 - [ドキュメント](https://steinbergmedia.github.io/vst3_doc/vstsdk/applications.html)
 
 GUIは起動しないので、お手軽な感じです。実はテストランナーも備えていて、以下の公式例のように書くと呼んでくれます。ちょっと記述量が多めですが。
+
 - [ITestを継承するテスト宣言](https://github.com/steinbergmedia/vst3_public_sdk/blob/master/samples/vst/adelay/source/factory.cpp#L72)、Factoryは[factory.cppで登録するため](https://github.com/steinbergmedia/vst3_public_sdk/blob/master/samples/vst/adelay/source/factory.cpp#L72)
 - [テスト実装](https://github.com/steinbergmedia/vst3_public_sdk/blob/master/samples/vst/adelay/source/factory.cpp#L72)、リソース確保などなければrunメソッドのみ。階層的にITestを登録したければFactoryのcreateTestsで登録できる
 
