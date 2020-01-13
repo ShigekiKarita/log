@@ -33,7 +33,7 @@ GUIは起動しないので、お手軽な感じです。実はテストラン�
 - [ITestを継承するテスト宣言](https://github.com/steinbergmedia/vst3_public_sdk/blob/master/samples/vst/adelay/source/factory.cpp#L72)、Factoryは[factory.cppで登録するため](https://github.com/steinbergmedia/vst3_public_sdk/blob/master/samples/vst/adelay/source/factory.cpp#L72)
 - [テスト実装](https://github.com/steinbergmedia/vst3_public_sdk/blob/master/samples/vst/adelay/source/factory.cpp#L72)、リソース確保などなければrunメソッドのみ。階層的にITestを登録したければFactoryのcreateTestsで登録できる
 
-現実的にはほとんど何もしないITest実装を作っておいて、GoogleTestなりなにか自分の好きなフレームワークをrunメソッドで呼ぶのもいいかもしれません。
+現実的にはこちらはEnd-to-endテスト用と割り切って、VSTに依存しない処理はGoogleTestなりなにか自分の好きなフレームワークを専用のmain関数をもつ実行ファイルから呼ぶだろうと思います
 
 ### 公式 editorhost
 
