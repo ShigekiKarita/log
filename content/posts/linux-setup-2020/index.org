@@ -1,0 +1,131 @@
+#+title: 2020年Linux開発マシン設定: btrfsに乗り換え
+#+summary:
+#+categories: Linux
+#+tags: Linux btrfs
+#+draft: false
+#+date: 2020-03-29
+#+author: Shigeki Karita
+#+isCJKLanguage: true
+#+markup: org
+#+toc: false
+
+** Thinkpad X1 Extreme Gen2
+
+年末に新しいマシン(Thinkpad X1 Extreme Gen2)買いました。そのセットアップなどの自分用メモです。
+
+[[file:./x1x.jpg]]
+
+X1 Extremeのすごいところは1.7kgとMacbook Proとかより軽いのに、しっかりキーボードの打ち心地もよく、メモリ(DDR4が2スロット)とストレージ(NVMeが2スロット)が増設可能なところです。最小構成で発注して、届いてすぐ増設しました。ちなみに公式サイトよりもヨドバシカメラ(おそらく店頭販売のみ)の方が安いです。
+
+** 2つのNVMe
+
+折角2スロットあるので、もともとあったWindows 10ストレージを1TBの増設NVMeに[[https://clonezilla.org/show-live-doc-content.php?topic=clonezilla-live/doc/03_Disk_to_disk_clone][Clonezillaのdisk-to-disk clone]]で移して、既存の小さいNVMeにUbuntuを入れました。ちなみに最初はWindows上で動くプロプライエタリソフトウェアを使ったのですが、遅いしGPT破損が避けられず全然うまく行きませんでした。以下のところで地味にハマりました:
+
+- Clonezilla の Live USB を使う
+- Secure boot をオフ
+- [[https://xtech.nikkei.com/atcl/nxt/column/18/00968/091300001/][高速スタートアップ]]をオフ
+
+** ext4からbtrfsに乗り換え
+
+今までUbuntuでデフォルトのext4を使っていたのですが、[[https://gihyo.jp/book/2018/978-4-7741-9607-7][Linuxのしくみ]]という本を読んで面白そうと思ったbtrfsを使おうと思いました。効率的に重複や読み書きをスキップするスナップショットやコピーオンライトといった技術でいうとzfsもいいなと思ったのですが、Linux上でのドキュメントやツールの充実具合から選びました。
+
+基本的にUbuntuインストーラ上でbtrfsを設定しただけですが、あとから ~/etc/fstab~ でSSD用と圧縮オプション ~ssd,compress=lzo~ を追加しました。
+#+BEGIN_SRC bash
+# /etc/fstab: static file system information.
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+# / was on /dev/nvme1n1p2 during installation
+UUID=e690b30f-52aa-4bf2-828a-85de64431456 /               btrfs   noatime,discard,ssd,compress=lzo,space_cache,subvol=@ 0       1
+# /boot/efi was on /dev/nvme0n1p1 during installation
+UUID=3E93-4FA7  /boot/efi       vfat    umask=0077      0       1
+# /home was on /dev/nvme1n1p2 during installation
+UUID=e690b30f-52aa-4bf2-828a-85de64431456 /home           btrfs   noatime,discard,ssd,compress=lzo,space_cache,subvol=@home 0       2
+# swap was on /dev/nvme1n1p4 during installation
+UUID=1a95e0ca-44c4-497c-b34e-7a7516d1790d none            swap    sw              0       0
+#+END_SRC
+
+** btrfs の snapshot 機能
+
+とりあえず最初にTwitter上で見てbtrfsをためそうと思ったきっかけのブログ記事「[[https://www.ncaq.net/2019/01/28/13/37/05/][デスクトップLinuxにBtrfsとSnapperを使うようになってファイルを間違えて削除してしまう恐怖から開放されました]]」を見ながら、snapperを導入しました。初心者すぎてよくわからなかったことをメモします。多くの方は私のいい加減なブログではなく[[https://wiki.archlinux.jp/index.php/Btrfs][Arch Wiki]]をまず見てください。
+
+*** subvolume という概念
+
+まだ慣れていないのですが、多くのファイルシステムの物理的なボリュームと、OS上のディレクトリの間くらいの概念で、柔軟にディレクトリごとのマウントオプションやスナップショットを設定できます。たとえばスナップショット自体も独立したsubvolumeに切られたりしてます。作ったり、一覧表示するにはbtrfsコマンドを使います。
+
+#+BEGIN_SRC bash
+$ sudo btrfs subvolume list -p .
+#+END_SRC
+
+私の方針は基本的には ~/home~ subvolume は全部自動スナップショットとることにして、明らかにいらない ~.pip~ だとか ~.dub~ のようなキャッシュ的なディレクトリ、大きめの3rdパーティソフトを新しくsubvolumeに切って除外しています(デフォルトではスナップショットされないので)。他にはarch wikiにあるようにpacmanやaptといったシステムのパッケージマネージャの履歴を保存する使い方も良いです。
+
+#+BEGIN_SRC
+$ sudo snapper get-config
+Key                    | Value
+-----------------------+------
+ALLOW_GROUPS           |      
+ALLOW_USERS            |      
+BACKGROUND_COMPARISON  | yes  
+EMPTY_PRE_POST_CLEANUP | yes  
+EMPTY_PRE_POST_MIN_AGE | 1800 
+FSTYPE                 | btrfs
+NUMBER_CLEANUP         | yes  
+NUMBER_LIMIT           | 50   
+NUMBER_LIMIT_IMPORTANT | 10   
+NUMBER_MIN_AGE         | 1800 
+QGROUP                 |      
+SPACE_LIMIT            | 0.5  
+SUBVOLUME              | /home
+SYNC_ACL               | no   
+TIMELINE_CLEANUP       | yes  
+TIMELINE_CREATE        | yes  
+TIMELINE_LIMIT_DAILY   | 10   
+TIMELINE_LIMIT_HOURLY  | 10   
+TIMELINE_LIMIT_MONTHLY | 10   
+TIMELINE_LIMIT_WEEKLY  | 0    
+TIMELINE_LIMIT_YEARLY  | 10   
+TIMELINE_MIN_AGE       | 1800 
+#+END_SRC
+
+*** snapshot の復元
+
+snapshotを取る方法はよく書かれているのですが、どうやってそこから復元するのか、正直よくわかってませんでした。たとえば上記の設定で ~/home/karita~ 以下に作った ~foo~ ファイルを消したときには、こうやって拾えます
+
+#+BEGIN_SRC bash
+$ cd /home/karita
+$ touch foo
+$ sudo snapper create --description test # 手動でsnapshot
+$ sudo snapper list  # test ができてる
+Type   | #   | Pre # | Date                        | User | Cleanup  | Description | Userdata
+-------+-----+-------+-----------------------------+------+----------+-------------+---------
+single | 0   |       |                             | root |          | current     |         
+single | 1   |       | Sun Dec 29 17:27:39 2019    | root |          | test        | 
+
+$ rm foo   # 消してみる
+$ sudo ls ../.snapshots/1/snapshot/karita  # foo の存在確認
+Desktop  dlang  Documents  Downloads  foo  Music  Pictures  Public  snap  Templates  tool  Videos
+#+END_SRC
+
+こんな感じで、subvolume直下の ~.snapshots~ ディレクトリ以下の番号付きのバックアップディレクトリがある体で、手軽にコピーしたり検索したりできます。ただしsnapshotからファイル削除するときなどは、書き込み可能にセット ~btrfs property set <file> ro false~ するなど安全に振ってるところはあります。
+
+
+** 起動が遅いとき
+
+最初、btrfsにしたせいで起動が遅いのかなと思ったのですが、 ~systemd-analyze blame~ という神コマンドで片っ端から遅いスタートアップ時のプロセスをオフにして1/100にまで高速化できました。私の環境では ~NetworkManager-wait-online.service~ が最も遅かったです。
+
+** Linux上のVBoxからWindows 10起動
+
+前にもやったので簡単にできると思ってたら、別々のNVMeにインストールしていたので追加の設定が必要でした。ちなみにNVMeだけどSATAとします。ここでは最初の項目がWindows 10の入ってるNVMeの仮想ディスク (vmdk) で、二個目がLinuxが入っている方です。これらはハードウェアと同じコントローラ接続構成にしないとWindowsの軟弱なUEFIだかGPTの設定が壊れてると勘違いしてしまいました。
+
+[[file: vbox.png]]
+
+それぞれの vmdk は ~/dev/nvme*~ など実在のデバイス名を確認しながら、こんな感じで作ります。パーティションとかはつけずそっくり作ります。
+#+BEGIN_SRC bash
+VBoxManage internalcommands createrawvmdk -filename "nvme1n1.vmdk" -rawdisk /dev/nvme1n1
+#+END_SRC
+まじめにディスクの指定を厳格にしたければ ~/dev/disk/by-id/nvme-*~ とかを rawdisk の引数とするのもいいと思います。
+
+** おわりに
+
+いまのところスナップショット・コピーオンライト以外の恩恵を受けていないので、今年こそはハードの増設などを視野にいれたNASを組んでみます。その際にあらためてZFSとの比較などもできれば。

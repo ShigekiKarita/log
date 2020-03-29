@@ -1,8 +1,7 @@
 sudo: false
 language: bash
 script:
-  - wget https://github.com/ShigekiKarita/hugo/releases/download/dlang-v1/hugo.tar.xz
-  - tar -xvf hugo.tar.xz
+  - wget -O- https://github.com/ShigekiKarita/hugo/releases/download/dlang-v1/hugo.tar.xz | tar xvf -
   - ./hugo
   - touch public/.nojekyll
 
