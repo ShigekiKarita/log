@@ -1,7 +1,7 @@
 sudo: false
 language: bash
 script:
-  - wget -qO- https://github.com/gohugoio/hugo/releases/download/v0.68.3/hugo_0.68.3_Linux-64bit.tar.gz | tar xvz -
+  - wget -qO- https://github.com/gohugoio/hugo/releases/download/v0.68.3/hugo_0.68.3_Linux-64bit.tar.gz | tar xvz
   - ./hugo
   - touch public/.nojekyll
 
