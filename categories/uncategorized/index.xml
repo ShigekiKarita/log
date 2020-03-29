@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>uncategorized on log</title>
+    <link>https://shigekikarita.github.io/log/categories/uncategorized/</link>
+    <description>Recent content in uncategorized on log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <lastBuildDate>Sun, 14 Jul 2019 18:33:18 +0900</lastBuildDate>
+    
+	<atom:link href="https://shigekikarita.github.io/log/categories/uncategorized/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>D言語(druntime)に初めて貢献した</title>
+      <link>https://shigekikarita.github.io/log/posts/druntime-hack/</link>
+      <pubDate>Sun, 14 Jul 2019 18:33:18 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/druntime-hack/</guid>
+      <description>tl;dr mir-algorithm を触っていたら D 言語の object.destroy が nothrow じゃないことに気づきPR nothrow でクラスオブジェクトを破棄できるようになる 初めてPR 送るなら，このリンク先を読もう</description>
+    </item>
+    
+  </channel>
+</rss>

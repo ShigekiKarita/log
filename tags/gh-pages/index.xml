@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>gh-pages on log</title>
+    <link>https://shigekikarita.github.io/log/tags/gh-pages/</link>
+    <description>Recent content in gh-pages on log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <lastBuildDate>Mon, 06 May 2019 22:28:52 +0900</lastBuildDate>
+    
+	<atom:link href="https://shigekikarita.github.io/log/tags/gh-pages/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>独自ドメイン取得した</title>
+      <link>https://shigekikarita.github.io/log/posts/new-domain/</link>
+      <pubDate>Mon, 06 May 2019 22:28:52 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/new-domain/</guid>
+      <description>tl;dr 新HP https://karita.xyz 新日記 (このページ) https://karita.xyz/log 経緯 (how to) スタードメインで .xyz ドメインが 1 円で売ってたので karita.xyz を取得した．翌年は1600円くらいかかるけど，何事も</description>
+    </item>
+    
+    <item>
+      <title>Hello Hugo</title>
+      <link>https://shigekikarita.github.io/log/posts/hello-hugo/</link>
+      <pubDate>Mon, 29 Apr 2019 12:56:42 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/hello-hugo/</guid>
+      <description>3度目の正直でまたブログを始めました&amp;hellip;．前は org-mode を使って構築したのですが，記事が多くなり1ページだと読みづらいし，カテゴリ分けや</description>
+    </item>
+    
+  </channel>
+</rss>

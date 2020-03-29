@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html class="no-js" lang="jp">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Hugo &#43; Org-Mode 執筆 Tips - log</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+	<meta property="og:title" content="Hugo &#43; Org-Mode 執筆 Tips" />
+<meta property="og:description" content="tl;dr ファイル archetypes/default.md に自分好みのテンプレを作ってボイラープレートを減らそう．最終的な org-mode 用の設定はこれ https://raw.githubusercontent.com/ShigekiKarita/log/master/archetypes/default.org はじめに 以前 Jekyll や org-mode でブログ書いてた時によく思っ" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://shigekikarita.github.io/log/posts/hugo-post-tips/" />
+<meta property="article:published_time" content="2019-04-30T12:57:29+09:00" />
+<meta property="article:modified_time" content="2019-04-30T12:57:29+09:00" />
+
+	<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Hugo &#43; Org-Mode 執筆 Tips"/>
+<meta name="twitter:description" content="tl;dr ファイル archetypes/default.md に自分好みのテンプレを作ってボイラープレートを減らそう．最終的な org-mode 用の設定はこれ https://raw.githubusercontent.com/ShigekiKarita/log/master/archetypes/default.org はじめに 以前 Jekyll や org-mode でブログ書いてた時によく思っ"/>
+
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/log/css/style.css">
+	<link rel="stylesheet" href="/log/css/custom.css">
+	<link rel="shortcut icon" href="/log/favicon.ico">
+		
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-139201189-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/log/" title="log" rel="home">
+				<div class="logo__title">log</div>
+				
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="https://shigekikarita.github.io">home</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="https://github.com/ShigekiKarita/log">github</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="https://travis-ci.org/ShigekiKarita/log">travis</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">Hugo &#43; Org-Mode 執筆 Tips</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg>
+	<time class="meta__text" datetime="2019-04-30T12:57:29">2019-04-30</time>
+</div>
+
+<div class="meta__item-categories meta__item">
+	<svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg>
+	<span class="meta__text"><a class="meta__link" href="/log/categories/programming" rel="category">Programming</a></span>
+</div>
+</div>
+		</header><div class="content post__content clearfix">
+			<h2 id="tldr">tl;dr</h2>
+<p>ファイル <code>archetypes/default.md</code> に自分好みのテンプレを作ってボイラープレートを減らそう．最終的な <code>org-mode</code> 用の設定はこれ</p>
+<blockquote>
+<p><a href="https://raw.githubusercontent.com/ShigekiKarita/log/master/archetypes/default.org">https://raw.githubusercontent.com/ShigekiKarita/log/master/archetypes/default.org</a></p>
+</blockquote>
+<h2 id="はじめに">はじめに</h2>
+<p>以前 Jekyll や org-mode でブログ書いてた時によく思ってたのが，タイトルとか日付といった「属性」を書くヘッダー的な部分をもっとテンプレ化しておきたいということ．移行した Hugo ではヘッダー的な部分を「Front Matter」と読んでいて，ユーザ定義もできたり無限に属性がある．</p>
+<p><a href="https://gohugo.io/content-management/front-matter/">https://gohugo.io/content-management/front-matter/</a></p>
+<p>Hugo といえば markdown で書いている人が多いと思うのですが，ファイル <code>archetypes/default.md</code> に自分好みのテンプレを作ってボイラープレートを減らせます．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ hugo new posts/xxx.md
+</code></pre></div><p>みたいなコマンドで新しい記事を生成するとき，そのテンプレ <code>archetypes/default.md</code> が選ばれて，その中のプレースホルダーが置き換えられるらしい．</p>
+<h2 id="課題">課題</h2>
+<p>org-mode でのテンプレを作る方法がよくわからない．例えば markdown では <code>archetypes/default.md</code> をこんな感じで設定しています．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-md" data-lang="md">---
+title: &#34;{{ replace .Name &#34;-&#34; &#34; &#34; | title }}&#34;
+summary: &#34;&#34;
+categories: [&#34;uncategorized&#34;]
+tags: []
+draft: true
+date: {{ .Date }}
+author: &#34;Shigeki Karita&#34;
+isCJKLanguage: true
+markup: &#34;md&#34;
+---
+
+<span style="color:#75715e">## tl;dr
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">## reference
+</span></code></pre></div><p>Front Matter の記法についてですが，ググると yaml/toml/json 色々でてきますが，おそらく yaml (<code>---</code> で区切られる) がいまの標準っぽい．余談だが <code>config.xxx</code> は toml が標準なのでどれでも良いから統一して欲しい．</p>
+<p><a href="https://gohugo.io/content-management/front-matter/#front-matter-formats">https://gohugo.io/content-management/front-matter/#front-matter-formats</a></p>
+<h2 id="解決">解決</h2>
+<p>色々しらべた結果， org-mode は markdown のような区切り文字ではなく，こんな感じで <code>archetypes/default.org</code> に設定できる．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-org" data-lang="org"><span style="color:#75715e">#+title</span><span style="color:#75715e">: {{ replace .Name &#34;-&#34; &#34; &#34; | title }}</span>
+<span style="color:#75715e">#+summary</span><span style="color:#75715e">:</span>
+<span style="color:#75715e">#+categories</span><span style="color:#75715e">: uncategorized</span>
+<span style="color:#75715e">#+tags</span><span style="color:#75715e">:</span>
+<span style="color:#75715e">#+draft</span><span style="color:#75715e">: true</span>
+<span style="color:#75715e">#+date</span><span style="color:#75715e">: {{ .Date }}</span>
+<span style="color:#75715e">#+author</span><span style="color:#75715e">: Shigeki Karita</span>
+<span style="color:#75715e">#+isCJKLanguage</span><span style="color:#75715e">: true</span>
+<span style="color:#75715e">#+markup</span><span style="color:#75715e">: org</span>
+
+<span style="color:#75715e">**</span> tl;dr
+
+<span style="color:#75715e">**</span> reference
+</code></pre></div><p>どうやら org-mode 独自のヘッダーのようで，Front Matter 第四の記法というわけです．主な文法としては</p>
+<ul>
+<li>文字列を引用符でくくらない．引用符もそのまま出力されてしまう</li>
+<li>tags のようなリスト値は `#+tags: foo bar** みたいな書き方</li>
+</ul>
+<p>といった具合．文法はマニュアルを見てみたけど，いまいち細かいことはわからない．
+<a href="https://orgmode.org/manual/Property-Syntax.html#Property-Syntax">https://orgmode.org/manual/Property-Syntax.html#Property-Syntax</a></p>
+<p>Hugo 側で独自に解釈しているところもあるっぽい．</p>
+<h2 id="こまかい話">こまかい話</h2>
+<p>具体的な書き方として， <strong>一番役に立ったのはこの人のブログだ．</strong>  とにかく沢山の記事がある．</p>
+<ul>
+<li>ソース <a href="https://github.com/hiroakit/blog">https://github.com/hiroakit/blog</a></li>
+<li>解説など <a href="https://www.hiroakit.com/2018/03/hugo-with-netlify/">https://www.hiroakit.com/2018/03/hugo-with-netlify/</a></li>
+</ul>
+<p>この記事や手元の挙動を見ていると幾つか注意点として</p>
+<ul>
+<li>markdown と違って org-mode の baseURL 的な解釈はうまくいってないようだ．</li>
+<li>例えばローカルの画像ファイルなどは記事ディレクトリを作り直下に置いて相対パスで指定するのがよい，その際に記事は <code>index.org</code> というファイル名に書く</li>
+<li>そもそも mustache 的なテンプレートは効かない?</li>
+<li>シンタックスハイライトは <code>#+begin_src perl</code> のような小文字ではダメで <code>#+BEGIN_SRC perl</code> としなければならない</li>
+</ul>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-org" data-lang="org"><span style="color:#75715e"># content/posts/foo/index.org という org ファイルを作ると</span>
+<span style="color:#75715e"># {{ baseURL }}/posts/foo/index.html として生成される</span>
+
+<span style="color:#75715e"># 大文字じゃないとダメ</span>
+<span style="color:#75715e">#+BEGIN_SRC </span><span style="color:#75715e">d</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">()</span> <span style="color:#f92672">{}</span>
+<span style="color:#75715e">#+END_SRC</span>
+
+<span style="color:#75715e"># 画像 content/posts/foo/bar.png というファイル</span>
+[[<span style="color:#a6e22e">file:./bar.png</span>]]
+</code></pre></div><h2 id="余談-d言語で実行時リフレクション">余談: D言語で実行時リフレクション</h2>
+<p><a href="http://mustache.github.io/">mustache</a>テンプレートエンジンといえば，Front Matterなんかは <code>.Name</code> とか明らかに Go っぽいフィールドにアクセスしていて，どうやってるのかなと色々調べたら， Go 言語にはリフレクションの公式パッケージがあるようだ．これは結構 Web 系のフレームワーク作りやすい気がする．</p>
+<p><a href="https://golang.org/pkg/reflect/#Value.FieldByName">https://golang.org/pkg/reflect/#Value.FieldByName</a></p>
+<p>エラー処理など真面目に作ると大変そうだが (Goでも既に大変そう)，D言語にもコンパイル時リフレクションがあるので実行時の文字列で与えられるフィールドにアクセスすることはできる．ちょっと書いてみた．</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-d" data-lang="d"><span style="color:#f92672">import</span> std.stdio<span style="color:#f92672">;</span>
+<span style="color:#f92672">import</span> std.variant<span style="color:#f92672">;</span>
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Hoge</span> <span style="color:#f92672">{</span>
+	<span style="color:#66d9ef">int</span> N<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">string</span> S<span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">auto</span> <span style="color:#a6e22e">maxFieldSize</span><span style="color:#f92672">(</span>T<span style="color:#f92672">)()</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">ulong</span> size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">foreach</span> <span style="color:#f92672">(</span>m<span style="color:#f92672">;</span> T<span style="color:#f92672">.</span><span style="color:#a6e22e">init</span><span style="color:#f92672">.</span><span style="color:#a6e22e">tupleof</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>size <span style="color:#f92672">&lt;</span> m<span style="color:#f92672">.</span><span style="color:#a6e22e">sizeof</span><span style="color:#f92672">)</span> size <span style="color:#f92672">=</span> m<span style="color:#f92672">.</span><span style="color:#a6e22e">sizeof</span><span style="color:#f92672">;</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">return</span> size<span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">auto</span> <span style="color:#a6e22e">fieldByName</span><span style="color:#f92672">(</span>T<span style="color:#f92672">)(</span>ref T x<span style="color:#f92672">,</span> <span style="color:#66d9ef">string</span> attr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    VariantN<span style="color:#f92672">!(</span>maxFieldSize<span style="color:#f92672">!</span>T<span style="color:#f92672">)</span> v<span style="color:#f92672">;</span>
+    <span style="color:#66d9ef">foreach</span> <span style="color:#f92672">(</span>a<span style="color:#f92672">;</span> __traits<span style="color:#f92672">(</span>allMembers<span style="color:#f92672">,</span> T<span style="color:#f92672">)){</span> 
+        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>a <span style="color:#f92672">==</span> attr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+            v <span style="color:#f92672">=</span> __traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> x<span style="color:#f92672">,</span> a<span style="color:#f92672">);</span>
+            <span style="color:#66d9ef">break</span><span style="color:#f92672">;</span>
+        <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+    <span style="color:#66d9ef">return</span> v<span style="color:#f92672">;</span>
+<span style="color:#f92672">}</span>
+
+<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">(</span><span style="color:#66d9ef">string</span><span style="color:#f92672">[]</span> args<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">const</span> Hoge h <span style="color:#f92672">=</span> <span style="color:#f92672">{</span><span style="color:#ae81ff">10</span><span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;aa&#34;</span><span style="color:#f92672">};</span>
+
+    <span style="color:#66d9ef">auto</span> v <span style="color:#f92672">=</span> h<span style="color:#f92672">.</span><span style="color:#a6e22e">tupleof</span><span style="color:#f92672">[</span><span style="color:#ae81ff">0</span><span style="color:#f92672">];</span>
+    <span style="color:#66d9ef">auto</span> name <span style="color:#f92672">=</span> __traits<span style="color:#f92672">(</span>allMembers<span style="color:#f92672">,</span> Hoge<span style="color:#f92672">)[</span><span style="color:#ae81ff">0</span><span style="color:#f92672">];</span>
+
+    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">fieldByName</span><span style="color:#f92672">(</span>name<span style="color:#f92672">)</span> <span style="color:#f92672">==</span> v<span style="color:#f92672">);</span>
+    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">fieldByName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;N&#34;</span><span style="color:#f92672">)</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">10</span><span style="color:#f92672">);</span>
+    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">fieldByName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;S&#34;</span><span style="color:#f92672">)</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;aa&#34;</span><span style="color:#f92672">);</span>
+    <span style="color:#75715e">// 元の Go のコード https://kwmt27.net/index.php/2013/10/02/get-field-value-of-struct-with-reflect-golang/
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// v := reflect.ValueOf(h) //Value
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// t := v.Type()           //Type
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// name := t.Field(0).Name
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// fmt.Println(name) //フィールド：N
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// fmt.Println(v.FieldByName(name).Interface()) //h.Nの値
+</span><span style="color:#75715e"></span><span style="color:#f92672">}</span>
+</code></pre></div><p>やはりD言語の <code>__traits</code> 関係は何でも出来て最高．返り値を <code>std.variant.VariantN</code> で型消去してます． <a href="https://dlang.org/phobos/std_variant.html">https://dlang.org/phobos/std_variant.html</a></p>
+<p>そうえいばD言語でもちゃんとしたテンプレートエンジンがある，DでHugoみたいなやつ作ってみようかな? <a href="https://qiita.com/repeatedly/items/300041d55fd5b45b69e1">https://qiita.com/repeatedly/items/300041d55fd5b45b69e1</a></p>
+<p>あとさっき twitter でD言語で実行時リフレクションライブラリがでてきたという話をみた． <a href="http://code.dlang.org/packages/hunt-reflection">http://code.dlang.org/packages/hunt-reflection</a></p>
+<h2 id="最後に">最後に</h2>
+<p>org-mode のサポートは未だ experimental な機能っぽいので(ドキュメントにもあまりでてこない)，不完全な部分もある．たとえばこの記事は markdown で書いているので PAGE CONTENT という目次がページ上部にちゃんとでていると思うが， org-mode で書いた記事には目次がでてこない．この辺はテーマのせいかもしれないし，切り分けが面倒なので今後の課題にしよう．次からは org-mode で記事を書こうと思う．私は markdown と org-mode どちらも良いものだと思っているので，両方使えるのは本当に良い．</p>
+<p>それにしてもGo言語にはorg-modeのパーサー実装 (<a href="https://github.com/chaseadamsio/goorgeous">https://github.com/chaseadamsio/goorgeous</a>) があるなんて，すごいコミュニティだと思った．やはりRuss Coxを始めパーサーやコンパイラ界隈の人々が多い気がする．</p>
+
+		</div>
+		
+<div class="post__tags tags clearfix">
+	<svg class="tags__icon icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5 0 11V3C0 1.5.8.8.8.8S1.5 0 3 0h8c1.5 0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>
+	<ul class="tags__list">
+		<li class="tags__item"><a class="tags__link btn" href="/log/tags/d/" rel="tag">D</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/log/tags/hugo/" rel="tag">Hugo</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/log/tags/go/" rel="tag">Go</a></li>
+		<li class="tags__item"><a class="tags__link btn" href="/log/tags/org-mode/" rel="tag">org-mode</a></li>
+	</ul>
+</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="Shigeki Karita avatar" src="/log/img/avatar.jpg" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About Shigeki Karita</span>
+	</div>
+	<div class="authorbox__description">
+		D言語と日々の研究について雑記
+	</div>
+</div>
+
+<nav class="post-nav flex">
+	<div class="post-nav__item post-nav__item--prev">
+		<a class="post-nav__link" href="/log/posts/hello-hugo/" rel="prev"><span class="post-nav__caption">«&thinsp;Previous</span><p class="post-nav__post-title">Hello Hugo</p></a>
+	</div>
+	<div class="post-nav__item post-nav__item--next">
+		<a class="post-nav__link" href="/log/posts/keyboards/" rel="next"><span class="post-nav__caption">Next&thinsp;»</span><p class="post-nav__post-title">手持ちのキーボードについて</p></a>
+	</div>
+</nav>
+
+
+			</div>
+			
+		</div>
+		<script type="text/x-mathjax-config">
+ MathJax.Hub.Config({
+     tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+     TeX: { equationNumbers: {autoNumber: "AMS"} }
+ });
+ MathJax.Hub.Config({
+     tex2jax: {
+         inlineMath: [['$','$'], ['\\(','\\)']],
+         displayMath: [['$$','$$'], ['\[','\]']],
+         processEscapes: true,
+         processEnvironments: true,
+         skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+         TeX: { equationNumbers: { autoNumber: "AMS" },
+                extensions: ["AMSmath.js", "AMSsymbols.js"] }
+     }
+ });
+
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+<div style="display:table;margin: 0 auto">
+Built at Travis CI <a href="https://travis-ci.org/ShigekiKarita/log"><img src="https://travis-ci.org/ShigekiKarita/log.svg?branch=master" ></a>
+</div>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+ (adsbygoogle = window.adsbygoogle || []).push({
+     google_ad_client: "ca-pub-6633457078111023",
+     enable_page_level_ads: true
+ });
+</script>
+
+	</div>
+<script async defer src="/log/js/menu.js"></script></body>
+</html>

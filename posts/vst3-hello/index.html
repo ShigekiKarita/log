@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html class="no-js" lang="jp">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Windows CUI環境における VST3 開発 - log</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+	<meta property="og:title" content="Windows CUI環境における VST3 開発" />
+<meta property="og:description" content="あけましておめでとうございます、今年こそはWindowsにも慣れていこうと思います。 今回はVST3開発環境構築と簡単なプロジェクトの作り方の" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://shigekikarita.github.io/log/posts/vst3-hello/" />
+<meta property="article:published_time" content="2020-01-12T02:24:12+09:00" />
+<meta property="article:modified_time" content="2020-01-12T02:24:12+09:00" />
+
+	<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="Windows CUI環境における VST3 開発"/>
+<meta name="twitter:description" content="あけましておめでとうございます、今年こそはWindowsにも慣れていこうと思います。 今回はVST3開発環境構築と簡単なプロジェクトの作り方の"/>
+
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/log/css/style.css">
+	<link rel="stylesheet" href="/log/css/custom.css">
+	<link rel="shortcut icon" href="/log/favicon.ico">
+		
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-139201189-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/log/" title="log" rel="home">
+				<div class="logo__title">log</div>
+				
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="https://shigekikarita.github.io">home</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="https://github.com/ShigekiKarita/log">github</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="https://travis-ci.org/ShigekiKarita/log">travis</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">Windows CUI環境における VST3 開発</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg>
+	<time class="meta__text" datetime="2020-01-12T02:24:12">2020-01-12</time>
+</div>
+
+<div class="meta__item-categories meta__item">
+	<svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg>
+	<span class="meta__text"><a class="meta__link" href="/log/categories/vst3" rel="category">VST3</a>, <a class="meta__link" href="/log/categories/c&#43;&#43;" rel="category">C&#43;&#43;</a></span>
+</div>
+</div>
+		</header><div class="content post__content clearfix">
+			<p>あけましておめでとうございます、今年こそはWindowsにも慣れていこうと思います。</p>
+<p>今回はVST3開発環境構築と簡単なプロジェクトの作り方のメモです。私は以前、<a href="https://github.com/AuburnSounds/Dplug">Dplug</a>を使って<a href="https://qiita.com/kari_tech/items/ef47d792b4aae047b42c">D言語でVSTを作っていたとき</a>はVST2を使ってました。しかしVST2の開発サポートが終わってしまったので、そろそろVST3に移行しようと考えていました。具体的なゴールとしてはVST3で登場したMIDIエフェクトが作りたいです。まず仕組みを知るために、公式のC++から入ります。ちなみにDplugではすでにVST3が<a href="https://github.com/AuburnSounds/Dplug/tree/master/vst3/dplug/vst3">サポート</a>されています。</p>
+<p>問題点としては、いつもメインのWin開発環境はMSYS2なのでgccを使いたいのですが、CMakeのスクリプトやC++のプリプロセッサなどを見る限りWindowsではVS前提に書かれていました (<code>cmake -G &quot;MSYS Makefiles&quot;</code> で動くようにするのは、理解の浅い現時点ではハードルが高いです)。さらに私にとってネットによくあるVSとCMakeのGUIを使った開発が無理だったので、最低限シェル内で完結して開発する方法を模索しました。</p>
+<h2 id="cmakeとvs2019-vc-compiler--win10-sdk-でvst3-sdkビルド">cmakeとVS2019 (VC compiler + Win10 SDK) で、VST3 SDKビルド</h2>
+<p><a href="https://steinbergmedia.github.io/vst3_doc/vstinterfaces/cmakeUse.html">公式サイト How to use cmake for Building VST 3 Plug-ins</a></p>
+<p>全体のながれ</p>
+<ul>
+<li><a href="https://cmake.org/download/">CMake公式</a>からビルド済みバイナリzipをDLしPATHを通す。ちなみにpacmanのcmakeはVSをサポートしてない</li>
+<li><a href="https://visualstudio.microsoft.com/ja/thank-you-downloading-visual-studio/?sku=Community&amp;rel=16">Visual Studio 2019 Installer</a> で &ldquo;C++によるデスクトップ開発&rdquo; &gt; &ldquo;MSVC v142&rdquo; および &ldquo;Windows 10 SDK&rdquo; にチェックをいれてインストールします。これが最小構成かと</li>
+<li><a href="https://www.steinberg.net/vst3sdk">VST3 Audio Plug-Ins SDK</a>をDLして、CUIからビルド</li>
+</ul>
+<p>最後にSDKをビルドします。versionは <a href="https://github.com/steinbergmedia/vst3sdk/commit/0908f475f52af56682321192d800ef25d1823dd2">3.6.14_build-24_2019-11-29</a> でした。VST2と違ってVST3はgithubにあるのが良いですね。<a href="https://steinbergmedia.github.io/vst3_doc/vstinterfaces/cmakeUse.html">公式ドキュメント</a>を参考にCUIからビルド:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd <span style="color:#e6db74">&#34;&lt;解凍先&gt;/VST SDK&#34;</span>
+
+<span style="color:#75715e"># vstsdk.sln を生成</span>
+mkdir build
+cd build
+cmake  -G <span style="color:#e6db74">&#34;Visual Studio 16 2019&#34;</span> -A x64 ../VST3_SDK
+cmake --build . --parallel <span style="color:#ae81ff">10</span>
+</code></pre></div><p>なお MSBuild.exe のログが日本語になって文字化けしていると思いますが、 <code>$ chcp 850</code> と打てば英語になってくれます。筆者の環境ではビルド完了まで1分ほどかかりました。ちなみに<code>--parallel</code>がMSBuild.exeで効いていないような気がします&hellip;。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># ビルドした検証ツールとVSTサンプルをテスト</span>
+./bin/Debug/validator.exe ./VST3/Debug/adelay.vst3
+</code></pre></div><p>一通りビルド成功していれば、<code>VST3/Debug</code> 以下に<a href="https://github.com/steinbergmedia/vst3_public_sdk/tree/master/samples/vst">VSTプラグインのサンプル</a>も一緒にビルドされていますので、動作確認に <code>bin/Debug</code> 以下にビルドされた<a href="https://github.com/steinbergmedia/vst3_public_sdk/tree/master/samples/vst-hosting/validator">VSTホストサンプルの検証ツール</a>を使えるはずです。以上で環境構築は終わりです。</p>
+<h2 id="新しいvst3プラグインを書く">新しいVST3プラグインを書く</h2>
+<p><a href="https://steinbergmedia.github.io/vst3_doc/vstinterfaces/addownplugs.html">公式サイト How to add/create your own VST 3 Plug-ins</a></p>
+<p>主にプロジェクト立ち上げ時に必ずやることとしては、</p>
+<ol>
+<li>自分のプラグイン置き場にhelloworldをコピーする</li>
+<li>置き場のCMakeList.txtに新しいサブディレクトリを追加</li>
+<li>新しいプラグイン名でhelloworld/HelloWorldを置換</li>
+<li>新しいuidで<code>include/plugid.h</code>を更新</li>
+<li>新しいプラグイン名で<code>include/version.h</code>を更新</li>
+<li>新しいプラグイン名で<code>resource/info.plist</code>を更新</li>
+</ol>
+<p>これ毎回やるの地獄だな&hellip;と思ったので、初期プロジェクトの構築を<a href="https://github.com/ShigekiKarita/vst3-tools/blob/master/init-plugin.sh">シェルスクリプト化</a>してみました(要bash)。使い方は</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">cd <span style="color:#e6db74">&#34;&lt;自作プラグイン置き場&gt;&#34;</span>
+git clone --recursive https://github.com/ShigekiKarita/vst3-tools
+./vst3-tools/init-plugin.sh FooBar
+
+<span style="color:#75715e"># copyrightなどの情報を更新</span>
+emacs FooBar/include/version.h
+</code></pre></div><p>これでFooBarというディレクトリとFooBarという表示名のfoobar.vst3が生成されるプロジェクトができます。<code>include/version.h</code>には著者名などを書き込む欄もありますので、忘れずに更新してください。ちなみに実装をすすめる際は次のようなステップがあるとのこと:</p>
+<ul>
+<li>plugcontroller.cpp にパラメータ追加</li>
+<li>plugprocessor.cpp にアルゴリズム追加</li>
+<li>plugprocessor.cpp に永続化を実装</li>
+<li>UI実装 (<a href="https://github.com/steinbergmedia/vst3_public_sdk/tree/bb0e864a336bbe9cc8d6dce1b9f47430d81ee84f/samples/vst/pitchnames/source">このへんのサンプル</a>が参考になりそう?)</li>
+</ul>
+<p>そして新しいプラグインを作ったときのビルド方法:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># このbuildディレクトリは自作プラグイン置き場の外に作らないといけない</span>
+mkdir build
+cd build
+
+cmake -DSMTG_ADD_VST3_PLUGINS_SAMPLES<span style="color:#f92672">=</span>OFF <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>      -DSMTG_ADD_VST3_HOSTING_SAMPLES<span style="color:#f92672">=</span>OFF <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>	  -DSMTG_MYPLUGINS_SRC_PATH<span style="color:#f92672">=</span><span style="color:#e6db74">&#34;&lt;自作プラグイン置き場&gt;&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>	  -G <span style="color:#e6db74">&#34;Visual Studio 16 2019&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>	  -A x64 <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>	  <span style="color:#e6db74">&#34;&lt;解凍先&gt;/VST_SDK/VST3_SDK&#34;</span>
+cmake --build . --parallel <span style="color:#ae81ff">10</span>
+</code></pre></div><p>この例でもビルドに30秒かかるので、毎回新しいプラグインやファイル作るたびにSDKと全自作プラグインがビルドし直しなのは嫌ですね。ただし、モジュールのない時代のC++にビルド設定で深入りするのも面倒ですし、SDK側もそこそこな頻度でアップデートあるからそういうものかと無理やり納得しています。</p>
+<h3 id="追記">追記</h3>
+<p>上記のビルド問題が嫌なので実験として下記のようにbuildディレクトリを消さずに、使いまわして新しくプロジェクトを追加したところ、普通に動くことがわかった。CMakeもVSのキャッシュもよくわかっていないので気持ち悪いけど、とりあえずこれで&hellip;。</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">mkdir build
+mkdir myVSTs
+cd myVSTs
+git clone --recursive https://github.com/ShigekiKarita/vst3-tools
+
+<span style="color:#75715e"># 1つ目のVST (SDKもビルドされる)</span>
+./vst3-tools/init-plugin.sh Vst1
+cd ../build
+cmake -DSMTG_ADD_VST3_PLUGINS_SAMPLES<span style="color:#f92672">=</span>OFF <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>      -DSMTG_ADD_VST3_HOSTING_SAMPLES<span style="color:#f92672">=</span>OFF <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>	  -DSMTG_MYPLUGINS_SRC_PATH<span style="color:#f92672">=</span>../myVSTs <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>	  -G <span style="color:#e6db74">&#34;Visual Studio 16 2019&#34;</span> <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>	  -A x64 <span style="color:#ae81ff">\
+</span><span style="color:#ae81ff"></span>	  <span style="color:#e6db74">&#34;&lt;解凍先&gt;/VST_SDK/VST3_SDK&#34;</span>
+cmake --build . --parallel <span style="color:#ae81ff">10</span>
+./bin/Debug/validator.exe ./VST3/Debug/vst1.vst3
+
+cd ../myVSTs
+
+<span style="color:#75715e"># 2つ目のVST (SDK、1つ目はビルドされずに使い回す)</span>
+./vst3-tools/init-plugin.sh Vst2
+cd ../build
+cmake --build . --parallel <span style="color:#ae81ff">10</span>
+./bin/Debug/validator.exe ./VST3/Debug/vst2.vst3
+</code></pre></div><h2 id="おわりに">おわりに</h2>
+<p>今回は環境構築で力尽きましたが、次回は作りたかったMIDIエフェクト、もしくはdplugでのVST3出力をやっていこうと思います。</p>
+
+		</div>
+		
+<div class="post__tags tags clearfix">
+	<svg class="tags__icon icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5 0 11V3C0 1.5.8.8.8.8S1.5 0 3 0h8c1.5 0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>
+	<ul class="tags__list">
+		<li class="tags__item"><a class="tags__link btn" href="/log/tags/vst3/" rel="tag">VST3</a></li>
+	</ul>
+</div>
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="Shigeki Karita avatar" src="/log/img/avatar.jpg" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About Shigeki Karita</span>
+	</div>
+	<div class="authorbox__description">
+		D言語と日々の研究について雑記
+	</div>
+</div>
+
+<nav class="post-nav flex">
+	<div class="post-nav__item post-nav__item--prev">
+		<a class="post-nav__link" href="/log/posts/dpp-guide/" rel="prev"><span class="post-nav__caption">«&thinsp;Previous</span><p class="post-nav__post-title">dpp: C/C&#43;&#43;ライブラリをD言語から楽に使う</p></a>
+	</div>
+	<div class="post-nav__item post-nav__item--next">
+		<a class="post-nav__link" href="/log/posts/vst3-test-tips/" rel="next"><span class="post-nav__caption">Next&thinsp;»</span><p class="post-nav__post-title">VST3開発TIPS テスト編</p></a>
+	</div>
+</nav>
+
+
+			</div>
+			
+		</div>
+		<script type="text/x-mathjax-config">
+ MathJax.Hub.Config({
+     tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+     TeX: { equationNumbers: {autoNumber: "AMS"} }
+ });
+ MathJax.Hub.Config({
+     tex2jax: {
+         inlineMath: [['$','$'], ['\\(','\\)']],
+         displayMath: [['$$','$$'], ['\[','\]']],
+         processEscapes: true,
+         processEnvironments: true,
+         skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+         TeX: { equationNumbers: { autoNumber: "AMS" },
+                extensions: ["AMSmath.js", "AMSsymbols.js"] }
+     }
+ });
+
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+<div style="display:table;margin: 0 auto">
+Built at Travis CI <a href="https://travis-ci.org/ShigekiKarita/log"><img src="https://travis-ci.org/ShigekiKarita/log.svg?branch=master" ></a>
+</div>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+ (adsbygoogle = window.adsbygoogle || []).push({
+     google_ad_client: "ca-pub-6633457078111023",
+     enable_page_level_ads: true
+ });
+</script>
+
+	</div>
+<script async defer src="/log/js/menu.js"></script></body>
+</html>

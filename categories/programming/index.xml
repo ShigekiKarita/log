@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Programming on log</title>
+    <link>https://shigekikarita.github.io/log/categories/programming/</link>
+    <description>Recent content in Programming on log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <lastBuildDate>Sun, 15 Dec 2019 00:00:00 +0900</lastBuildDate>
+    
+	<atom:link href="https://shigekikarita.github.io/log/categories/programming/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>dpp: C/C&#43;&#43;ライブラリをD言語から楽に使う</title>
+      <link>https://shigekikarita.github.io/log/posts/dpp-guide/</link>
+      <pubDate>Sun, 15 Dec 2019 00:00:00 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/dpp-guide/</guid>
+      <description>これは D言語Advent Calendar，16日目の記事です． はじめに 筆者は常々，D言語の唯一(?)の欠点はコミュニティの小ささ ≒ ライブラリ</description>
+    </item>
+    
+    <item>
+      <title>スマホでコーディング</title>
+      <link>https://shigekikarita.github.io/log/posts/dev-at-phone/</link>
+      <pubDate>Mon, 24 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/dev-at-phone/</guid>
+      <description>正気を失ったかと思われるかもしれませんが，Andridスマホを屋外での開発マシンにしようと思いました．夏になるとノートPCを背負って移動が嫌</description>
+    </item>
+    
+    <item>
+      <title>D言語の実行時リフレクション</title>
+      <link>https://shigekikarita.github.io/log/posts/dlang-reflect/</link>
+      <pubDate>Thu, 02 May 2019 20:27:21 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/dlang-reflect/</guid>
+      <description>tl;dr この前書いたD言語の実行時リフレクション，実行時の文字列からフィールドを呼び出す getter を書き直して， setter も作ったよ． 前回の get 実装 https://shigekikarita.github.io/log/posts/hugo-post-tips/ 前回の実装では</description>
+    </item>
+    
+    <item>
+      <title>Hugo &#43; Org-Mode 執筆 Tips</title>
+      <link>https://shigekikarita.github.io/log/posts/hugo-post-tips/</link>
+      <pubDate>Tue, 30 Apr 2019 12:57:29 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/hugo-post-tips/</guid>
+      <description>tl;dr ファイル archetypes/default.md に自分好みのテンプレを作ってボイラープレートを減らそう．最終的な org-mode 用の設定はこれ https://raw.githubusercontent.com/ShigekiKarita/log/master/archetypes/default.org はじめに 以前 Jekyll や org-mode でブログ書いてた時によく思っ</description>
+    </item>
+    
+    <item>
+      <title>Hello Hugo</title>
+      <link>https://shigekikarita.github.io/log/posts/hello-hugo/</link>
+      <pubDate>Mon, 29 Apr 2019 12:56:42 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/hello-hugo/</guid>
+      <description>3度目の正直でまたブログを始めました&amp;hellip;．前は org-mode を使って構築したのですが，記事が多くなり1ページだと読みづらいし，カテゴリ分けや</description>
+    </item>
+    
+  </channel>
+</rss>

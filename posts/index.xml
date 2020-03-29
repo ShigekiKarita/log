@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on log</title>
+    <link>https://shigekikarita.github.io/log/posts/</link>
+    <description>Recent content in Posts on log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <lastBuildDate>Sun, 29 Mar 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://shigekikarita.github.io/log/posts/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>2020年Linux開発マシン設定: btrfsに乗り換え</title>
+      <link>https://shigekikarita.github.io/log/posts/linux-setup-2020/</link>
+      <pubDate>Sun, 29 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/linux-setup-2020/</guid>
+      <description>Thinkpad X1 Extreme Gen2 年末に新しいマシン(Thinkpad X1 Extreme Gen2)買いました。そのセットアップなどの自分用メモです。 X1 Extremeのすごいところ:</description>
+    </item>
+    
+    <item>
+      <title>VST3開発TIPS テスト編</title>
+      <link>https://shigekikarita.github.io/log/posts/vst3-test-tips/</link>
+      <pubDate>Mon, 13 Jan 2020 16:53:29 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/vst3-test-tips/</guid>
+      <description>前回に引き続きCUIでVST3開発をすすめています。いくつか役立ちそうなTIPS+、とくにテスト関連をメモしています。適宜追加するかもしれま</description>
+    </item>
+    
+    <item>
+      <title>Windows CUI環境における VST3 開発</title>
+      <link>https://shigekikarita.github.io/log/posts/vst3-hello/</link>
+      <pubDate>Sun, 12 Jan 2020 02:24:12 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/vst3-hello/</guid>
+      <description>あけましておめでとうございます、今年こそはWindowsにも慣れていこうと思います。 今回はVST3開発環境構築と簡単なプロジェクトの作り方の</description>
+    </item>
+    
+    <item>
+      <title>dpp: C/C&#43;&#43;ライブラリをD言語から楽に使う</title>
+      <link>https://shigekikarita.github.io/log/posts/dpp-guide/</link>
+      <pubDate>Sun, 15 Dec 2019 00:00:00 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/dpp-guide/</guid>
+      <description>これは D言語Advent Calendar，16日目の記事です． はじめに 筆者は常々，D言語の唯一(?)の欠点はコミュニティの小ささ ≒ ライブラリ</description>
+    </item>
+    
+    <item>
+      <title>Arduino UNOでMIDIエクスプレッションペダル自作</title>
+      <link>https://shigekikarita.github.io/log/posts/arduino-midi/</link>
+      <pubDate>Sat, 23 Nov 2019 20:51:03 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/arduino-midi/</guid>
+      <description>はじめて電子工作しました。DTM用というかPCソフトウェアのギターエフェクトとかを操作するためにUSB接続できるMIDIエクスプレッションペ</description>
+    </item>
+    
+    <item>
+      <title>D言語はC&#43;&#43;17に対してどう優れているのか? (翻訳)</title>
+      <link>https://shigekikarita.github.io/log/posts/how-does-d-improve-on-c&#43;&#43;17/</link>
+      <pubDate>Sat, 02 Nov 2019 14:12:18 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/how-does-d-improve-on-c&#43;&#43;17/</guid>
+      <description>もうすぐC++20が出そうですね、その前に振り返りを兼ねて、Guillaume Piolat氏のHow does D improve on C++17?を翻訳しました。 — How</description>
+    </item>
+    
+    <item>
+      <title>D言語(druntime)に初めて貢献した</title>
+      <link>https://shigekikarita.github.io/log/posts/druntime-hack/</link>
+      <pubDate>Sun, 14 Jul 2019 18:33:18 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/druntime-hack/</guid>
+      <description>tl;dr mir-algorithm を触っていたら D 言語の object.destroy が nothrow じゃないことに気づきPR nothrow でクラスオブジェクトを破棄できるようになる 初めてPR 送るなら，このリンク先を読もう</description>
+    </item>
+    
+    <item>
+      <title>スマホでコーディング</title>
+      <link>https://shigekikarita.github.io/log/posts/dev-at-phone/</link>
+      <pubDate>Mon, 24 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/dev-at-phone/</guid>
+      <description>正気を失ったかと思われるかもしれませんが，Andridスマホを屋外での開発マシンにしようと思いました．夏になるとノートPCを背負って移動が嫌</description>
+    </item>
+    
+    <item>
+      <title>独自ドメイン取得した</title>
+      <link>https://shigekikarita.github.io/log/posts/new-domain/</link>
+      <pubDate>Mon, 06 May 2019 22:28:52 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/new-domain/</guid>
+      <description>tl;dr 新HP https://karita.xyz 新日記 (このページ) https://karita.xyz/log 経緯 (how to) スタードメインで .xyz ドメインが 1 円で売ってたので karita.xyz を取得した．翌年は1600円くらいかかるけど，何事も</description>
+    </item>
+    
+    <item>
+      <title>糖質制限記: 豆腐ハンバーグ</title>
+      <link>https://shigekikarita.github.io/log/posts/toushitsu1/</link>
+      <pubDate>Fri, 03 May 2019 20:51:03 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/toushitsu1/</guid>
+      <description>はじめに 三日坊主にならないように，GW中はブログを毎日更新しようと思ってましたが，かなり話題が偏っています．妻に相談したら「糖質制限してるし</description>
+    </item>
+    
+    <item>
+      <title>D言語の実行時リフレクション</title>
+      <link>https://shigekikarita.github.io/log/posts/dlang-reflect/</link>
+      <pubDate>Thu, 02 May 2019 20:27:21 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/dlang-reflect/</guid>
+      <description>tl;dr この前書いたD言語の実行時リフレクション，実行時の文字列からフィールドを呼び出す getter を書き直して， setter も作ったよ． 前回の get 実装 https://shigekikarita.github.io/log/posts/hugo-post-tips/ 前回の実装では</description>
+    </item>
+    
+    <item>
+      <title>手持ちのキーボードについて</title>
+      <link>https://shigekikarita.github.io/log/posts/keyboards/</link>
+      <pubDate>Wed, 01 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/keyboards/</guid>
+      <description>学生のころは，PC買えばついてくるキーボードという付属品に，わざわざ別売りの1万円以上払って買うのはおかしいと思ってました．しかし，Macの</description>
+    </item>
+    
+    <item>
+      <title>Hugo &#43; Org-Mode 執筆 Tips</title>
+      <link>https://shigekikarita.github.io/log/posts/hugo-post-tips/</link>
+      <pubDate>Tue, 30 Apr 2019 12:57:29 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/hugo-post-tips/</guid>
+      <description>tl;dr ファイル archetypes/default.md に自分好みのテンプレを作ってボイラープレートを減らそう．最終的な org-mode 用の設定はこれ https://raw.githubusercontent.com/ShigekiKarita/log/master/archetypes/default.org はじめに 以前 Jekyll や org-mode でブログ書いてた時によく思っ</description>
+    </item>
+    
+    <item>
+      <title>Hello Hugo</title>
+      <link>https://shigekikarita.github.io/log/posts/hello-hugo/</link>
+      <pubDate>Mon, 29 Apr 2019 12:56:42 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/hello-hugo/</guid>
+      <description>3度目の正直でまたブログを始めました&amp;hellip;．前は org-mode を使って構築したのですが，記事が多くなり1ページだと読みづらいし，カテゴリ分けや</description>
+    </item>
+    
+  </channel>
+</rss>

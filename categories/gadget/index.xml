@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Gadget on log</title>
+    <link>https://shigekikarita.github.io/log/categories/gadget/</link>
+    <description>Recent content in Gadget on log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <lastBuildDate>Sat, 23 Nov 2019 20:51:03 +0900</lastBuildDate>
+    
+	<atom:link href="https://shigekikarita.github.io/log/categories/gadget/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Arduino UNOでMIDIエクスプレッションペダル自作</title>
+      <link>https://shigekikarita.github.io/log/posts/arduino-midi/</link>
+      <pubDate>Sat, 23 Nov 2019 20:51:03 +0900</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/arduino-midi/</guid>
+      <description>はじめて電子工作しました。DTM用というかPCソフトウェアのギターエフェクトとかを操作するためにUSB接続できるMIDIエクスプレッションペ</description>
+    </item>
+    
+    <item>
+      <title>手持ちのキーボードについて</title>
+      <link>https://shigekikarita.github.io/log/posts/keyboards/</link>
+      <pubDate>Wed, 01 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/keyboards/</guid>
+      <description>学生のころは，PC買えばついてくるキーボードという付属品に，わざわざ別売りの1万円以上払って買うのはおかしいと思ってました．しかし，Macの</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="no-js" lang="jp">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>D言語(druntime)に初めて貢献した - log</title>
+	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
+	<meta name="description" content="">
+	<meta property="og:title" content="D言語(druntime)に初めて貢献した" />
+<meta property="og:description" content="tl;dr mir-algorithm を触っていたら D 言語の object.destroy が nothrow じゃないことに気づきPR nothrow でクラスオブジェクトを破棄できるようになる 初めてPR 送るなら，このリンク先を読もう" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://shigekikarita.github.io/log/posts/druntime-hack/" />
+<meta property="article:published_time" content="2019-07-14T18:33:18+09:00" />
+<meta property="article:modified_time" content="2019-07-14T18:33:18+09:00" />
+
+	<meta name="twitter:card" content="summary"/>
+<meta name="twitter:title" content="D言語(druntime)に初めて貢献した"/>
+<meta name="twitter:description" content="tl;dr mir-algorithm を触っていたら D 言語の object.destroy が nothrow じゃないことに気づきPR nothrow でクラスオブジェクトを破棄できるようになる 初めてPR 送るなら，このリンク先を読もう"/>
+
+	<link rel="dns-prefetch" href="//fonts.googleapis.com">
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
+	<link rel="stylesheet" href="/log/css/style.css">
+	<link rel="stylesheet" href="/log/css/custom.css">
+	<link rel="shortcut icon" href="/log/favicon.ico">
+		
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+	ga('create', 'UA-139201189-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+<script async src='https://www.google-analytics.com/analytics.js'></script>
+
+</head>
+<body class="body">
+	<div class="container container--outer">
+		<header class="header">
+	<div class="container">
+		<div class="logo">
+			<a class="logo__link" href="/log/" title="log" rel="home">
+				<div class="logo__title">log</div>
+				
+			</a>
+		</div>
+		
+<nav class="menu">
+	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
+		<span class="menu__btn-title" tabindex="-1">Menu</span>
+	</button>
+	<ul class="menu__list">
+		<li class="menu__item">
+			<a class="menu__link" href="https://shigekikarita.github.io">home</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="https://github.com/ShigekiKarita/log">github</a>
+		</li>
+		<li class="menu__item">
+			<a class="menu__link" href="https://travis-ci.org/ShigekiKarita/log">travis</a>
+		</li>
+	</ul>
+</nav>
+
+	</div>
+</header>
+		<div class="wrapper flex">
+			<div class="primary">
+			
+<main class="main" role="main">
+	<article class="post">
+		<header class="post__header">
+			<h1 class="post__title">D言語(druntime)に初めて貢献した</h1>
+			<div class="post__meta meta">
+<div class="meta__item-datetime meta__item">
+	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg>
+	<time class="meta__text" datetime="2019-07-14T18:33:18">2019-07-14</time>
+</div>
+
+<div class="meta__item-categories meta__item">
+	<svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg>
+	<span class="meta__text"><a class="meta__link" href="/log/categories/uncategorized" rel="category">uncategorized</a></span>
+</div>
+</div>
+		</header>
+<div class="post__toc toc">
+	<div class="toc__title">Page content</div>
+	<div class="toc__menu">
+		<nav id="TableOfContents">
+<ul>
+<li><a href="#headline-1">tl;dr</a>
+</li>
+<li><a href="#headline-2">直した object.destroy のバグ</a>
+</li>
+<li><a href="#headline-3">手元で修正・テスト</a>
+</li>
+<li><a href="#headline-4">PRを送る</a>
+<ul>
+<li><a href="#headline-5">破壊的変更でなければ master ではなく stable ブランチ</a>
+</li>
+<li><a href="#headline-6">バグの場合は bugzilla に登録．恐らく自動でchangelogに反映される</a>
+</li>
+<li><a href="#headline-7">regression testを書く</a>
+</li>
+</ul>
+</li>
+<li><a href="#headline-8">workaround</a>
+</li>
+<li><a href="#headline-9">おわりに</a>
+</li>
+</ul>
+</nav>
+	</div>
+</div>
+<div class="content post__content clearfix">
+			
+<h3 id="headline-1">
+tl;dr
+</h3>
+<ul>
+<li>
+<p>
+mir-algorithm を触っていたら D 言語の <a href="https://dlang.org/library/object/destroy.html">object.destroy</a> が nothrow じゃないことに気づきPR
+</p>
+</li>
+<li>
+<p>
+nothrow でクラスオブジェクトを破棄できるようになる
+</p>
+</li>
+<li>
+<p>
+初めてPR 送るなら，<a href="https://wiki.dlang.org/Starting_as_a_Contributor">このリンク先</a>を読もう
+</p>
+</li>
+</ul>
+<p>
+送ったPR:  <a href="https://github.com/dlang/druntime/pull/2674">https://github.com/dlang/druntime/pull/2674</a>
+</p>
+<h3 id="headline-2">
+直した object.destroy のバグ
+</h3>
+<p>
+object.destroy はオブジェクトを渡すとすぐそのデストラクタを呼び，初期化する関数です．最近消えた delete 関数の代わりに使うことが一般的になりました．ちなみに nogc で動くので nothrow さえ保証できればD言語のクラスによる設計をC/C++並みに幅広い環境で使うことができます．
+</p>
+<p>
+私の場合は <a href="https://github.com/ShigekiKarita/grain2/">grain2</a> というライブラリを作っていて，mir-algorithmの参照カウンタを使い，nogcかつnothrowに実装しているのですが，このコードが動かないことがわかりました．
+</p>
+<div class="src src-d">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-d" data-lang="d"><span style="color:#66d9ef">nothrow</span> unittest
+<span style="color:#f92672">{</span>
+    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">C</span>
+    <span style="color:#f92672">{</span>
+        <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> dtorCount <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">()</span> <span style="color:#66d9ef">nothrow</span> <span style="color:#f92672">{}</span>
+        <span style="color:#f92672">~</span><span style="color:#66d9ef">this</span><span style="color:#f92672">()</span> <span style="color:#66d9ef">nothrow</span> <span style="color:#f92672">{</span> dtorCount<span style="color:#f92672">++;</span> <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">auto</span> c <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> C<span style="color:#f92672">;</span>
+    destroy<span style="color:#f92672">(</span>c<span style="color:#f92672">);</span> <span style="color:#75715e">// こいつがnothrowじゃないのでコンパイルエラー
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>C<span style="color:#f92672">.</span><span style="color:#a6e22e">dtorCount</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">);</span>
+<span style="color:#f92672">}</span>
+</code></pre></div>
+</div>
+<p>
+普通は明示的にdestroyを呼ぶシーンは少ないと思います (リソース節約のために積極的に書いてもいいと思います)．RAIIはdestroyは使わないし，これまで destroy がなければnothrowで通っていたので，気づく機会もなかったのかなと思います．
+</p>
+<p>
+修正自体は <code>object.d</code> 内の <code>rt_finalize</code> の前方宣言に <code>nothrow</code> つけるだけで誰でもできるものでしたが，みなさんに色々手引してもらい申し訳なかったので，ここに書き留めて次回に活かします．
+</p>
+<h3 id="headline-3">
+手元で修正・テスト
+</h3>
+<p>
+D言語はコンパイラ，ランタイム，標準ライブラリ他が別リポジトリで管理されていて環境構築がしんどいのですが， <a href="https://github.com/CyberShadow/Digger">Digger</a> を使うと楽です．
+</p>
+<div class="src src-bash">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># あんまり新しいDMDだと digger がビルドできない，テストするDMDとは別なのでOK</span>
+source <span style="color:#e6db74">&#34;</span><span style="color:#66d9ef">$(</span>curl -fsS  --retry <span style="color:#ae81ff">3</span> https://dlang.org/install.sh | bash -s dmd-2.084.0 --activate<span style="color:#66d9ef">)</span><span style="color:#e6db74">&#34;</span>
+dub fetch digger
+dub run digger -- checkout <span style="color:#e6db74">&#34;stable&#34;</span>  <span style="color:#75715e"># デフォルトは master</span>
+dub run digger -- rebuild
+
+<span style="color:#75715e"># 今回は druntime だけ修正する． digger test は全部のリポジトリをテストするので長い</span>
+cd ./work/repo/druntime
+make -f posix.mak -j style unittest-debug</code></pre></div>
+</div>
+<p>
+当然，最後のディレクトリはgit cloneしたリポジトリなので，自分のforkしたリポジトリで適当にbranchを切ってテストや修正をcommit/pushするとPRが作れるようになります．全体のテストはCIに任せました．
+</p>
+<h3 id="headline-4">
+PRを送る
+</h3>
+<p>
+とりあえず今回わかったのは，PR送る時は以下の3つに気をつけたい
+</p>
+<ol>
+<li>
+<p>
+破壊的変更でなければ master ではなく stable ブランチ
+</p>
+</li>
+<li>
+<p>
+バグの場合は <a href="https://issues.dlang.org">Bugzilla</a> に登録．PRのタイトルに &#34;Fix issue XXXX - title&#34;
+</p>
+</li>
+<li>
+<p>
+修正を確認 + 再発させないために regression test (unittestなど) を書く，Bugzilla id も忘れず
+</p>
+</li>
+</ol>
+<p>
+その他の細かいことはWikiの <a href="https://wiki.dlang.org/Starting_as_a_Contributor">Starting as a Contributor</a> を読みましょう．全部書いてあります，私は読んでいなかった..．英語読める人は私の記事ではなくWikiを読んでください．
+</p>
+<h4 id="headline-5">
+破壊的変更でなければ master ではなく stable ブランチ
+</h4>
+<p>
+何も読まずに普通にmasterに送ってしまった．stableにPRのターゲットを変更するとmasterのcommitが入ってしまうので, PR用のブランチで <code>git rebase --onto stable master</code> としました．push済みの場合は，歴史改変なので <code>git push --force</code> が必要．この辺も<a href="https://wiki.dlang.org/Starting_as_a_Contributor#Stable_Branch">Wiki</a>に書いてあるので読みましょう．
+</p>
+<h4 id="headline-6">
+バグの場合は bugzilla に登録．恐らく自動でchangelogに反映される
+</h4>
+<p>
+私は雑にPRしてしまいましたが，一度Bugzillaを見て報告されていないか見ましょう．なければ新たに再現コードを貼って登録するだけで良いようです．誰かが二度修正するのを防げますし，PRタイトルやcommit logで &#34;Fix Issue XXXX&#34; と残すと自動でchangelogに反映されて，管理者や開発者の皆さんの手間が減るそうです．
+</p>
+<h4 id="headline-7">
+regression testを書く
+</h4>
+<p>
+簡単に unittest が書ける場合は修正したコードの近くに unittest を書きます．unittestでチェックできないことを確かめたい時は， <code>test/</code> 以下にいろいろな例があるのでそこに再現スクリプトを追加してMakefileにビルドを追記します．いずれにせよテストにはコメントでBugzillaのIDを書く必要があります．自明だと思っても二度と再発しないようにテストを書きましょう．独自のCIもあり面白い
+</p>
+<ul>
+<li>
+<p>
+appveyor: windows上でのテスト
+</p>
+</li>
+<li>
+<p>
+circleci: linux (ubuntu18.04) 上でのテスト
+</p>
+</li>
+<li>
+<p>
+buildkite: 主要なDUB上のパッケージをテスト(?)
+</p>
+</li>
+<li>
+<p>
+<a href="https://forum.dlang.org/post/ytvvhpzyyoqxarizyqqe@beta.forum.dlang.org">DAutoTest</a>: 独自のドキュメントビルドCI
+</p>
+</li>
+<li>
+<p>
+<a href="https://auto-tester.puremagic.com/">autotestor</a>: 独自のCI．全ツールをWin/Linux/Darwin/FreeBSDの32/64bit環境でテストしている，一番重い
+</p>
+</li>
+</ul>
+<h3 id="headline-8">
+workaround
+</h3>
+<p>
+今回の修正は stable ブランチにマージされるので，すぐ使えるようになると思いますが，古いD言語環境のために<a href="https://github.com/libmir/mir-algorithm/issues/208">mir-algorithmの作者に教えてもらった回避方法</a>を紹介します．destroyは2つの挙動があり，D言語オブジェクトなら問題の <code>rt_finalize</code> を C++ オブジェクトなら別の方法でデストラクタを呼びます．後者はすでに nothrow なのでデストラクタを持つ型はC++にしておいて中身はD言語にするのが回避策です．
+</p>
+<div class="src src-d">
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-d" data-lang="d"><span style="color:#66d9ef">nothrow</span> unittest
+<span style="color:#f92672">{</span>
+    extern <span style="color:#f92672">(</span>C<span style="color:#f92672">++)</span> <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">C</span>
+    <span style="color:#f92672">{</span>
+        extern <span style="color:#f92672">(</span>D<span style="color:#f92672">):</span>
+        <span style="color:#66d9ef">static</span> <span style="color:#66d9ef">int</span> dtorCount <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">;</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">()</span> <span style="color:#66d9ef">nothrow</span> <span style="color:#f92672">{}</span>
+        <span style="color:#f92672">~</span><span style="color:#66d9ef">this</span><span style="color:#f92672">()</span> <span style="color:#66d9ef">nothrow</span> <span style="color:#f92672">{</span> dtorCount<span style="color:#f92672">++;</span> <span style="color:#f92672">}</span>
+    <span style="color:#f92672">}</span>
+
+    <span style="color:#66d9ef">auto</span> c <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> C<span style="color:#f92672">;</span>
+    destroy<span style="color:#f92672">(</span>c<span style="color:#f92672">);</span> <span style="color:#75715e">// destroy が C++ 用の処理に入るので nothrow
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>C<span style="color:#f92672">.</span><span style="color:#a6e22e">dtorCount</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">);</span>
+<span style="color:#f92672">}</span>
+</code></pre></div>
+</div>
+<p>
+さきほどの例だとこんな感じで回避できます
+</p>
+<h3 id="headline-9">
+おわりに
+</h3>
+<p>
+思ったよりハードル低かったので，また懲りずに<a href="https://issues.dlang.org/describecomponents.cgi?product=D">Bugzilla</a>眺めてPRしたいです
+</p>
+
+		</div>
+		
+	</article>
+</main>
+
+<div class="authorbox clearfix">
+	<figure class="authorbox__avatar">
+		<img alt="Shigeki Karita avatar" src="/log/img/avatar.jpg" class="avatar" height="90" width="90">
+	</figure>
+	<div class="authorbox__header">
+		<span class="authorbox__name">About Shigeki Karita</span>
+	</div>
+	<div class="authorbox__description">
+		D言語と日々の研究について雑記
+	</div>
+</div>
+
+<nav class="post-nav flex">
+	<div class="post-nav__item post-nav__item--prev">
+		<a class="post-nav__link" href="/log/posts/dev-at-phone/" rel="prev"><span class="post-nav__caption">«&thinsp;Previous</span><p class="post-nav__post-title">スマホでコーディング</p></a>
+	</div>
+	<div class="post-nav__item post-nav__item--next">
+		<a class="post-nav__link" href="/log/posts/how-does-d-improve-on-c&#43;&#43;17/" rel="next"><span class="post-nav__caption">Next&thinsp;»</span><p class="post-nav__post-title">D言語はC&#43;&#43;17に対してどう優れているのか? (翻訳)</p></a>
+	</div>
+</nav>
+
+
+			</div>
+			
+		</div>
+		<script type="text/x-mathjax-config">
+ MathJax.Hub.Config({
+     tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+     TeX: { equationNumbers: {autoNumber: "AMS"} }
+ });
+ MathJax.Hub.Config({
+     tex2jax: {
+         inlineMath: [['$','$'], ['\\(','\\)']],
+         displayMath: [['$$','$$'], ['\[','\]']],
+         processEscapes: true,
+         processEnvironments: true,
+         skipTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+         TeX: { equationNumbers: { autoNumber: "AMS" },
+                extensions: ["AMSmath.js", "AMSsymbols.js"] }
+     }
+ });
+
+</script>
+<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+<div style="display:table;margin: 0 auto">
+Built at Travis CI <a href="https://travis-ci.org/ShigekiKarita/log"><img src="https://travis-ci.org/ShigekiKarita/log.svg?branch=master" ></a>
+</div>
+
+
+
+
+
+<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+<script>
+ (adsbygoogle = window.adsbygoogle || []).push({
+     google_ad_client: "ca-pub-6633457078111023",
+     enable_page_level_ads: true
+ });
+</script>
+
+	</div>
+<script async defer src="/log/js/menu.js"></script></body>
+</html>

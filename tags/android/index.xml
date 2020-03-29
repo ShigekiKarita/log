@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Android on log</title>
+    <link>https://shigekikarita.github.io/log/tags/android/</link>
+    <description>Recent content in Android on log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <lastBuildDate>Mon, 24 Jun 2019 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://shigekikarita.github.io/log/tags/android/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>スマホでコーディング</title>
+      <link>https://shigekikarita.github.io/log/posts/dev-at-phone/</link>
+      <pubDate>Mon, 24 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/dev-at-phone/</guid>
+      <description>正気を失ったかと思われるかもしれませんが，Andridスマホを屋外での開発マシンにしようと思いました．夏になるとノートPCを背負って移動が嫌</description>
+    </item>
+    
+  </channel>
+</rss>

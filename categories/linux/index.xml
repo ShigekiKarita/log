@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Linux on log</title>
+    <link>https://shigekikarita.github.io/log/categories/linux/</link>
+    <description>Recent content in Linux on log</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>jp</language>
+    <lastBuildDate>Sun, 29 Mar 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://shigekikarita.github.io/log/categories/linux/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>2020年Linux開発マシン設定: btrfsに乗り換え</title>
+      <link>https://shigekikarita.github.io/log/posts/linux-setup-2020/</link>
+      <pubDate>Sun, 29 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://shigekikarita.github.io/log/posts/linux-setup-2020/</guid>
+      <description>Thinkpad X1 Extreme Gen2 年末に新しいマシン(Thinkpad X1 Extreme Gen2)買いました。そのセットアップなどの自分用メモです。 X1 Extremeのすごいところ:</description>
+    </item>
+    
+  </channel>
+</rss>
