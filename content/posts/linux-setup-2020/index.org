@@ -52,13 +52,13 @@ UUID=1a95e0ca-44c4-497c-b34e-7a7516d1790d none            swap    sw            
 
 *** subvolume という概念
 
-まだ慣れていないのですが、多くのファイルシステムの物理的なボリュームと、OS上のディレクトリの間くらいの概念で、柔軟にディレクトリごとのマウントオプションやスナップショットを設定できます。たとえばスナップショット自体も独立したsubvolumeに切られたりしてます。作ったり、一覧表示するにはbtrfsコマンドを使います。
+まだ慣れていないのですが、多くのファイルシステムの物理的なボリュームと、OS上のディレクトリの間くらいの概念で、柔軟にディレクトリごとのマウントオプションやスナップショットを設定できます。たとえばスナップショット自体も独立したsubvolumeに切られたりしてます。新たに作ったり、一覧表示するにはbtrfsコマンドを使います。
 
 #+BEGIN_SRC bash
 $ sudo btrfs subvolume list -p .
 #+END_SRC
 
-私の方針は基本的には ~/home~ subvolume は全部自動スナップショットとることにして、明らかにいらない ~.pip~ だとか ~.dub~ のようなキャッシュ的なディレクトリ、大きめの3rdパーティソフトを新しくsubvolumeに切って除外しています(デフォルトではスナップショットされないので)。他にはarch wikiにあるようにpacmanやaptといったシステムのパッケージマネージャの履歴を保存する使い方も良いです。
+私の方針は基本的には ~/home~ subvolume は全部自動スナップショットとることにして、明らかにバックアップがいらない ~.pip~ だとか ~.dub~ のようなキャッシュ的なディレクトリ、大きめの3rdパーティソフトを新しくsubvolumeに切って除外しています(デフォルトではスナップショットされないので)。他にはarch wikiにあるようにpacmanやaptといったシステムのパッケージマネージャの履歴を保存する使い方も良いです。
 
 #+BEGIN_SRC
 $ sudo snapper get-config
@@ -112,7 +112,7 @@ Desktop  dlang  Documents  Downloads  foo  Music  Pictures  Public  snap  Templa
 
 ** 起動が遅いとき
 
-最初、btrfsにしたせいで起動が遅いのかなと思ったのですが、 ~systemd-analyze blame~ という神コマンドで片っ端から遅いスタートアップ時のプロセスをオフにして1/100にまで高速化できました。私の環境では ~NetworkManager-wait-online.service~ が最も遅かったです。
+最初、btrfsにしたせいで起動が遅いのかなと思ったのですが、 ~systemd-analyze blame~ という神コマンドで片っ端から遅いスタートアップ時のプロセスをオフにして1/100にまで高速化できました。私の環境では ~NetworkManager-wait-online.service~ が最も遅かったです。この辺もやはり[[https://wiki.archlinux.jp/index.php/%E3%83%96%E3%83%BC%E3%83%88%E3%83%91%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%B3%E3%82%B9%E3%81%AE%E5%90%91%E4%B8%8A][Arch Wikiに良い記事]]があり参考にします。
 
 ** Linux上のVBoxからWindows 10起動
 
