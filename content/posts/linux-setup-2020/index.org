@@ -138,4 +138,6 @@ VBoxManage internalcommands createrawvmdk -filename "nvme1n1.vmdk" -rawdisk /dev
 
 いまのところスナップショット・コピーオンライト以外の恩恵を受けていないので、今年こそはハードの増設などを視野にいれたNASを組んでみます。その際にあらためてZFSとの比較などもできれば。
 
-あと今回から、このブログを [[https://github.com/ShigekiKarita/log/blob/master/.github/workflows/build.yml][GitHub Actions]] で deploy してみました。いままで何だかんだ30-60秒くらいTravisではかかっていたし、たまにdeploy失敗するのでしんどかったのですが、GAでは10-15秒くらいで公開できるようです。[[https://help.github.com/ja/actions/configuring-and-managing-workflows/creating-and-storing-encrypted-secrets][Secret 変数をどこに格納するのか]]少し躓きましたが、ドキュメントも多いし良いです。
+あと今回から、このブログを [[https://github.com/ShigekiKarita/log/blob/master/.github/workflows/build.yml][GitHub Actions]] で deploy してみました。いままで何だかんだ30-60秒くらいTravisではかかっていたし、たまにdeploy失敗するのでしんどかったのですが、GAでは10-15秒くらいで公開できるようです。認証のためにsecret token, sshとgithub tokenという幾つか方法があるのですが、github tokenはactionsの特権で何も設定する必要がなくて良いです。
+
+[[https://github.com/peaceiris/actions-gh-pages][https://github.com/peaceiris/actions-gh-pages]]

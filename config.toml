@@ -22,12 +22,6 @@ pygmentsCodefences=true
     url = "https://shigekikarita.github.io"
     weight = -110
   [[menu.main]]
-    identifier = "travis"
-    name = "travis"
-    pre = "<i class='fa fa-heart'></i>"
-    url = "https://travis-ci.org/ShigekiKarita/log"
-    weight = -10
-  [[menu.main]]
     identifier = "github"
     name = "github"
     pre = "<i class='fa fa-heart'></i>"
@@ -69,4 +63,4 @@ pygmentsCodefences=true
   # Enable parts of social widget
   twitter = "kari_tech"
   github = "ShigekiKarita"
-  email = "shigekikarita@gmail.com"
+  email = "karita@ieee.org"
