@@ -1,237 +1,66 @@
-<!DOCTYPE html>
-<html class="no-js" lang="jp">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>dpp: C/C&#43;&#43;ライブラリをD言語から楽に使う - log</title>
-	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
-	<meta name="description" content="">
-	<meta property="og:title" content="dpp: C/C&#43;&#43;ライブラリをD言語から楽に使う" />
-<meta property="og:description" content="これは D言語Advent Calendar，16日目の記事です． はじめに 筆者は常々，D言語の唯一(?)の欠点はコミュニティの小ささ ≒ ライブラリ" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://shigekikarita.github.io/log/posts/dpp-guide/" />
-<meta property="article:published_time" content="2019-12-15T00:00:00+09:00" />
-<meta property="article:modified_time" content="2019-12-15T00:00:00+09:00" />
-
-	<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="dpp: C/C&#43;&#43;ライブラリをD言語から楽に使う"/>
-<meta name="twitter:description" content="これは D言語Advent Calendar，16日目の記事です． はじめに 筆者は常々，D言語の唯一(?)の欠点はコミュニティの小ささ ≒ ライブラリ"/>
-
-	<link rel="dns-prefetch" href="//fonts.googleapis.com">
-	<link rel="dns-prefetch" href="//fonts.gstatic.com">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
-	<link rel="stylesheet" href="/log/css/style.css">
-	<link rel="stylesheet" href="/log/css/custom.css">
-	<link rel="shortcut icon" href="/log/favicon.ico">
-		
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-139201189-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
-
-</head>
-<body class="body">
-	<div class="container container--outer">
-		<header class="header">
-	<div class="container">
-		<div class="logo">
-			<a class="logo__link" href="/log/" title="log" rel="home">
-				<div class="logo__title">log</div>
-				
-			</a>
-		</div>
-		
-<nav class="menu">
-	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
-		<span class="menu__btn-title" tabindex="-1">Menu</span>
-	</button>
-	<ul class="menu__list">
-		<li class="menu__item">
-			<a class="menu__link" href="https://shigekikarita.github.io">home</a>
-		</li>
-		<li class="menu__item">
-			<a class="menu__link" href="https://github.com/ShigekiKarita/log">github</a>
-		</li>
-		<li class="menu__item">
-			<a class="menu__link" href="https://travis-ci.org/ShigekiKarita/log">travis</a>
-		</li>
-	</ul>
-</nav>
-
-	</div>
-</header>
-		<div class="wrapper flex">
-			<div class="primary">
-			
-<main class="main" role="main">
-	<article class="post">
-		<header class="post__header">
-			<h1 class="post__title">dpp: C/C&#43;&#43;ライブラリをD言語から楽に使う</h1>
-			<div class="post__meta meta">
-<div class="meta__item-datetime meta__item">
-	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg>
-	<time class="meta__text" datetime="2019-12-15T00:00:00">2019-12-15</time>
-</div>
-
-<div class="meta__item-categories meta__item">
-	<svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg>
-	<span class="meta__text"><a class="meta__link" href="/log/categories/programming" rel="category">Programming</a>, <a class="meta__link" href="/log/categories/d" rel="category">D</a></span>
-</div>
-</div>
-		</header><div class="content post__content clearfix">
-			<p>これは <a href="https://qiita.com/advent-calendar/2019/dlang">D言語Advent Calendar</a>，16日目の記事です．</p>
-<h2 id="はじめに">はじめに</h2>
-<p>筆者は常々，D言語の唯一(?)の欠点はコミュニティの小ささ ≒ ライブラリの少なさだと思っていました．
+<!doctype html><html class=no-js lang=jp><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><title>dpp: C/C++ライブラリをD言語から楽に使う - log</title><script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script><meta name=description content><meta property="og:title" content="dpp: C/C++ライブラリをD言語から楽に使う"><meta property="og:description" content="これは D言語Advent Calendar，16日目の記事です． はじめに 筆者は常々，D言語の唯一(?)の欠点はコミュニティの小ささ ≒ ライブラリ"><meta property="og:type" content="article"><meta property="og:url" content="https://shigekikarita.github.io/log/posts/dpp-guide/"><meta property="article:published_time" content="2019-12-15T00:00:00+09:00"><meta property="article:modified_time" content="2019-12-15T00:00:00+09:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="dpp: C/C++ライブラリをD言語から楽に使う"><meta name=twitter:description content="これは D言語Advent Calendar，16日目の記事です． はじめに 筆者は常々，D言語の唯一(?)の欠点はコミュニティの小ささ ≒ ライブラリ"><link rel=dns-prefetch href=//fonts.googleapis.com><link rel=dns-prefetch href=//fonts.gstatic.com><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700"><link rel=stylesheet href=/log/css/style.css><link rel=stylesheet href=/log/css/custom.css><link rel="shortcut icon" href=/log/favicon.ico><script type=application/javascript>var doNotTrack=false;if(!doNotTrack){window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-139201189-1','auto');ga('send','pageview');}</script><script async src=https://www.google-analytics.com/analytics.js></script></head><body class=body><div class="container container--outer"><header class=header><div class=container><div class=logo><a class=logo__link href=/log/ title=log rel=home><div class=logo__title>log</div></a></div><nav class=menu><button class=menu__btn aria-haspopup=true aria-expanded=false tabindex=0>
+<span class=menu__btn-title tabindex=-1>Menu</span></button><ul class=menu__list><li class=menu__item><a class=menu__link href=https://shigekikarita.github.io>home</a></li><li class=menu__item><a class=menu__link href=https://github.com/ShigekiKarita/log>github</a></li><li class=menu__item><a class=menu__link href=https://travis-ci.org/ShigekiKarita/log>travis</a></li></ul></nav></div></header><div class="wrapper flex"><div class=primary><main class=main role=main><article class=post><header class=post__header><h1 class=post__title>dpp: C/C++ライブラリをD言語から楽に使う</h1><div class="post__meta meta"><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2019-12-15T00:00:00>2019-12-15</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/log/categories/programming rel=category>Programming</a>, <a class=meta__link href=/log/categories/d rel=category>D</a></span></div></div></header><div class="content post__content clearfix"><p>これは <a href=https://qiita.com/advent-calendar/2019/dlang>D言語Advent Calendar</a>，16日目の記事です．</p><h2 id=はじめに>はじめに</h2><p>筆者は常々，D言語の唯一(?)の欠点はコミュニティの小ささ ≒ ライブラリの少なさだと思っていました．
 しかし実はC/C++とのABI互換性がサポートされており、dppのようなヘッダー生成ツールを使えば，莫大な C/C++ コミュニティのライブラリを全自動で再利用できます．
-<a href="https://qiita.com/nonanonno/items/6cc1baac2acd780ee2e4#v4l2-%E3%81%AE-d-%E7%A7%BB%E6%A4%8D">昨日は同系統の先発ツールdstepが紹介されて</a>います．
+<a href=https://qiita.com/nonanonno/items/6cc1baac2acd780ee2e4#v4l2-%E3%81%AE-d-%E7%A7%BB%E6%A4%8D>昨日は同系統の先発ツールdstepが紹介されて</a>います．
 本記事では後発のdppが非常に大きなライブラリでも実用的に使えるようになったことを紹介します．
-とくにC/C++から段階的に移行したい読者にとって，D言語を始める良い機会になればと思います．</p>
-<h2 id="d言語と-cc-の互換性">D言語と C/C++ の互換性</h2>
-<p>D言語にはCおよびC++(!!)との互換性があるので， <code>extern (C)</code> または <code>extern (C++)</code> で修飾子した型や関数を宣言(bind)して，ビルド済みのC/C++ライブラリをリンクすれば自由に呼び出すことが可能です．</p>
-<ul>
-<li><a href="https://dlang.org/spec/interfaceToC.html">Interfacing to C</a></li>
-<li><a href="https://dlang.org/spec/cpp_interface.html">Interfacing to C++</a></li>
-</ul>
-<p>D言語の標準ライブラリ(ランタイム)にある <code>core.stdc</code> と <code>core.stdcpp</code> は，それぞれC/C++標準ライブラリをbindしています．最近では <code>std::vector</code> のような大作も入っています．</p>
-<ul>
-<li><a href="https://github.com/dlang/druntime/tree/v2.089.0/src/core/stdc">https://github.com/dlang/druntime/tree/v2.089.0/src/core/stdc</a></li>
-<li><a href="https://github.com/dlang/druntime/tree/v2.089.0/src/core/stdcpp">https://github.com/dlang/druntime/tree/v2.089.0/src/core/stdcpp</a></li>
-</ul>
-<p>ただし，bindを人手で書くので間違えたりするとリンクエラーになったり，巨大なライブラリだと記述量が多くて面倒です (人手で頑張っている <a href="https://github.com/D-Programming-Deimos">deimos</a>や, <a href="https://github.com/DerelictOrg">derelict</a>とその置き換えである<a href="https://github.com/BindBC">bindbc</a> などのプロジェクトもあります)．</p>
-<p>そこで登場したのが dpp です．</p>
-<p><a href="https://github.com/atilaneves/dpp">https://github.com/atilaneves/dpp</a></p>
-<p>dpp は C/C++ コンパイラのフロントエンド API (libclang) を内部で使うことで，includeしたC/C++ヘッダーから自動的にD言語用の宣言を生成してビルドします．たとえばPythonやJuliaといった巨大なプロジェクトのCヘッダーでさえ，自動でbindできる完成度の高いツールです．</p>
-<h2 id="インストール">インストール</h2>
-<p>Debian系のOSなら以下のように環境構築できます．</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#75715e"># libclang のインストール</span>
+とくにC/C++から段階的に移行したい読者にとって，D言語を始める良い機会になればと思います．</p><h2 id=d言語と-cc-の互換性>D言語と C/C++ の互換性</h2><p>D言語にはCおよびC++(!!)との互換性があるので， <code>extern (C)</code> または <code>extern (C++)</code> で修飾子した型や関数を宣言(bind)して，ビルド済みのC/C++ライブラリをリンクすれば自由に呼び出すことが可能です．</p><ul><li><a href=https://dlang.org/spec/interfaceToC.html>Interfacing to C</a></li><li><a href=https://dlang.org/spec/cpp_interface.html>Interfacing to C++</a></li></ul><p>D言語の標準ライブラリ(ランタイム)にある <code>core.stdc</code> と <code>core.stdcpp</code> は，それぞれC/C++標準ライブラリをbindしています．最近では <code>std::vector</code> のような大作も入っています．</p><ul><li><a href=https://github.com/dlang/druntime/tree/v2.089.0/src/core/stdc>https://github.com/dlang/druntime/tree/v2.089.0/src/core/stdc</a></li><li><a href=https://github.com/dlang/druntime/tree/v2.089.0/src/core/stdcpp>https://github.com/dlang/druntime/tree/v2.089.0/src/core/stdcpp</a></li></ul><p>ただし，bindを人手で書くので間違えたりするとリンクエラーになったり，巨大なライブラリだと記述量が多くて面倒です (人手で頑張っている <a href=https://github.com/D-Programming-Deimos>deimos</a>や, <a href=https://github.com/DerelictOrg>derelict</a>とその置き換えである<a href=https://github.com/BindBC>bindbc</a> などのプロジェクトもあります)．</p><p>そこで登場したのが dpp です．</p><p><a href=https://github.com/atilaneves/dpp>https://github.com/atilaneves/dpp</a></p><p>dpp は C/C++ コンパイラのフロントエンド API (libclang) を内部で使うことで，includeしたC/C++ヘッダーから自動的にD言語用の宣言を生成してビルドします．たとえばPythonやJuliaといった巨大なプロジェクトのCヘッダーでさえ，自動でbindできる完成度の高いツールです．</p><h2 id=インストール>インストール</h2><p>Debian系のOSなら以下のように環境構築できます．</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=color:#75715e># libclang のインストール</span>
 sudo apt-get install libclang-6.0-dev
 
-<span style="color:#75715e"># D言語コンパイラのインストール</span>
-source <span style="color:#66d9ef">$(</span>curl https://dlang.org/install.sh | bash -s -- ldc-1.18.0 -a<span style="color:#66d9ef">)</span>
+<span style=color:#75715e># D言語コンパイラのインストール</span>
+source <span style=color:#66d9ef>$(</span>curl https://dlang.org/install.sh | bash -s -- ldc-1.18.0 -a<span style=color:#66d9ef>)</span>
 
-<span style="color:#75715e"># dpp のビルド</span>
-dub fetch dpp --version<span style="color:#f92672">=</span>0.4.0
+<span style=color:#75715e># dpp のビルド</span>
+dub fetch dpp --version<span style=color:#f92672>=</span>0.4.0
 dub run dpp -- --help
-</code></pre></div><h2 id="基本的な使い方">基本的な使い方</h2>
-<p>D言語のソースコード中に <code>#include &lt;C/C++ヘッダー名&gt;</code> を記載した dpp ファイルをコンパイルできます．</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">dub run dpp -- <span style="color:#f92672">(</span>オプション<span style="color:#f92672">)</span> ファイル名.dpp
-</code></pre></div><p>以下のオプションが便利です</p>
-<ul>
-<li><code>--compiler</code> dmd や ldc2 などコンパイラを指定</li>
-<li><code>--include-path</code> C/C++ライブラリヘッダーのパスを指定</li>
-<li><code>--parse-as-cpp</code> includeしたヘッダーをC++の文脈で解釈</li>
-<li><code>--keep-d-files</code> 自動で生成したD bindingヘッダーを出力</li>
-<li><code>--preprocess-only</code> 上記のヘッダーを出力だけしてコンパイルせず終了</li>
-</ul>
-<h2 id="例1-単一のファイル">例1: 単一のファイル</h2>
-<p>D言語はビルドが高速で，短く記述できるのでスクリプトとして単一のファイルを使うことも多いでしょう．</p>
-<p>今回は未だBindBCに追加されていないOpenCLを例に，D言語からライブラリ関数を呼んでGPUなどのデバイス情報を表示します．
+</code></pre></div><h2 id=基本的な使い方>基本的な使い方</h2><p>D言語のソースコード中に <code>#include &lt;C/C++ヘッダー名></code> を記載した dpp ファイルをコンパイルできます．</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>dub run dpp -- <span style=color:#f92672>(</span>オプション<span style=color:#f92672>)</span> ファイル名.dpp
+</code></pre></div><p>以下のオプションが便利です</p><ul><li><code>--compiler</code> dmd や ldc2 などコンパイラを指定</li><li><code>--include-path</code> C/C++ライブラリヘッダーのパスを指定</li><li><code>--parse-as-cpp</code> includeしたヘッダーをC++の文脈で解釈</li><li><code>--keep-d-files</code> 自動で生成したD bindingヘッダーを出力</li><li><code>--preprocess-only</code> 上記のヘッダーを出力だけしてコンパイルせず終了</li></ul><h2 id=例1-単一のファイル>例1: 単一のファイル</h2><p>D言語はビルドが高速で，短く記述できるのでスクリプトとして単一のファイルを使うことも多いでしょう．</p><p>今回は未だBindBCに追加されていないOpenCLを例に，D言語からライブラリ関数を呼んでGPUなどのデバイス情報を表示します．
 なおOpenCLのインストール方法は利用しているハードウェアベンダのものを推奨します．
-よくわからないときは<a href="http://portablecl.org/">pocl</a>などがaptでインストールできるので便利です．</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-opencl_test.d" data-lang="opencl_test.d"><span style="color:#960050;background-color:#1e0010">#</span>include <span style="color:#f92672">&lt;</span>CL<span style="color:#f92672">/</span>cl<span style="color:#f92672">.</span><span style="color:#a6e22e">h</span><span style="color:#f92672">&gt;</span>
+よくわからないときは<a href=http://portablecl.org/>pocl</a>などがaptでインストールできるので便利です．</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-opencl_test.d data-lang=opencl_test.d><span style=color:#960050;background-color:#1e0010>#</span>include <span style=color:#f92672>&lt;</span>CL<span style=color:#f92672>/</span>cl<span style=color:#f92672>.</span><span style=color:#a6e22e>h</span><span style=color:#f92672>&gt;</span>
 
-<span style="color:#f92672">import</span> std.stdio <span style="color:#f92672">:</span> writeln<span style="color:#f92672">;</span>
+<span style=color:#f92672>import</span> std.stdio <span style=color:#f92672>:</span> writeln<span style=color:#f92672>;</span>
 
-<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">main</span><span style="color:#f92672">()</span>
-<span style="color:#f92672">{</span>
-    <span style="color:#75715e">// get first platform and device
-</span><span style="color:#75715e"></span>    cl_platform_id platform<span style="color:#f92672">;</span>
-    cl_device_id device<span style="color:#f92672">;</span>
-    clGetPlatformIDs<span style="color:#f92672">(</span><span style="color:#ae81ff">1</span><span style="color:#f92672">,</span> <span style="color:#f92672">&amp;</span>platform<span style="color:#f92672">,</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
-    clGetDeviceIDs<span style="color:#f92672">(</span>platform<span style="color:#f92672">,</span> CL_DEVICE_TYPE_DEFAULT<span style="color:#f92672">,</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">,</span> <span style="color:#f92672">&amp;</span>device<span style="color:#f92672">,</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
+<span style=color:#66d9ef>void</span> <span style=color:#a6e22e>main</span><span style=color:#f92672>()</span>
+<span style=color:#f92672>{</span>
+    <span style=color:#75715e>// get first platform and device
+</span><span style=color:#75715e></span>    cl_platform_id platform<span style=color:#f92672>;</span>
+    cl_device_id device<span style=color:#f92672>;</span>
+    clGetPlatformIDs<span style=color:#f92672>(</span><span style=color:#ae81ff>1</span><span style=color:#f92672>,</span> <span style=color:#f92672>&amp;</span>platform<span style=color:#f92672>,</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>);</span>
+    clGetDeviceIDs<span style=color:#f92672>(</span>platform<span style=color:#f92672>,</span> CL_DEVICE_TYPE_DEFAULT<span style=color:#f92672>,</span> <span style=color:#ae81ff>1</span><span style=color:#f92672>,</span> <span style=color:#f92672>&amp;</span>device<span style=color:#f92672>,</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>);</span>
 
-    <span style="color:#75715e">// print device info
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">foreach</span> <span style="color:#f92672">(</span>q<span style="color:#f92672">;</span> <span style="color:#f92672">[</span>CL_DEVICE_NAME<span style="color:#f92672">,</span> CL_DEVICE_VERSION<span style="color:#f92672">,</span> CL_DRIVER_VERSION<span style="color:#f92672">])</span>
-    <span style="color:#f92672">{</span>
-        cl_ulong len<span style="color:#f92672">;</span>
-        clGetDeviceInfo<span style="color:#f92672">(</span>device<span style="color:#f92672">,</span> q<span style="color:#f92672">,</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">,</span> <span style="color:#f92672">&amp;</span>len<span style="color:#f92672">);</span>
-        <span style="color:#66d9ef">auto</span> cs <span style="color:#f92672">=</span> <span style="color:#66d9ef">new</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">[</span>len<span style="color:#f92672">];</span>
-        clGetDeviceInfo<span style="color:#f92672">(</span>device<span style="color:#f92672">,</span> q<span style="color:#f92672">,</span> len<span style="color:#f92672">,</span> cs<span style="color:#f92672">.</span><span style="color:#a6e22e">ptr</span><span style="color:#f92672">,</span> <span style="color:#66d9ef">null</span><span style="color:#f92672">);</span>
-        writeln<span style="color:#f92672">(</span>cs<span style="color:#f92672">);</span>
-    <span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
+    <span style=color:#75715e>// print device info
+</span><span style=color:#75715e></span>    <span style=color:#66d9ef>foreach</span> <span style=color:#f92672>(</span>q<span style=color:#f92672>;</span> <span style=color:#f92672>[</span>CL_DEVICE_NAME<span style=color:#f92672>,</span> CL_DEVICE_VERSION<span style=color:#f92672>,</span> CL_DRIVER_VERSION<span style=color:#f92672>])</span>
+    <span style=color:#f92672>{</span>
+        cl_ulong len<span style=color:#f92672>;</span>
+        clGetDeviceInfo<span style=color:#f92672>(</span>device<span style=color:#f92672>,</span> q<span style=color:#f92672>,</span> <span style=color:#ae81ff>0</span><span style=color:#f92672>,</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>,</span> <span style=color:#f92672>&amp;</span>len<span style=color:#f92672>);</span>
+        <span style=color:#66d9ef>auto</span> cs <span style=color:#f92672>=</span> <span style=color:#66d9ef>new</span> <span style=color:#66d9ef>char</span><span style=color:#f92672>[</span>len<span style=color:#f92672>];</span>
+        clGetDeviceInfo<span style=color:#f92672>(</span>device<span style=color:#f92672>,</span> q<span style=color:#f92672>,</span> len<span style=color:#f92672>,</span> cs<span style=color:#f92672>.</span><span style=color:#a6e22e>ptr</span><span style=color:#f92672>,</span> <span style=color:#66d9ef>null</span><span style=color:#f92672>);</span>
+        writeln<span style=color:#f92672>(</span>cs<span style=color:#f92672>);</span>
+    <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
 
-</code></pre></div><p>以下を実行すると，ハードウェア情報が表示されるはずです．</p>
-<pre><code class="language-console" data-lang="console">$ dub run dpp -- --compiler=ldc2 opencl_test.dpp -L-lOpenCL
+</code></pre></div><p>以下を実行すると，ハードウェア情報が表示されるはずです．</p><pre><code class=language-console data-lang=console>$ dub run dpp -- --compiler=ldc2 opencl_test.dpp -L-lOpenCL
 $ ./opencl_test
 Intel(R) Gen9 HD Graphics NEO
 OpenCL 2.1 NEO 
 19.26.13286
-</code></pre><p>ちなみにdmdを使うとコンパイラのバグで異常終了します(!?)．</p>
-<h2 id="例2-dub-との連携">例2: DUB との連携</h2>
-<p>現状，簡単にDUBと連携する方法はないです．ただしdppは中間のD言語ヘッダーを出力できるので，preBuildCommandsを使って追加設定をするなど連携できます</p>
-<ul>
-<li>dub.json の <code>preBuildCommands</code> で dpp をインストールし・ヘッダーを自動生成</li>
-<li><code>libs</code> にリンクするライブラリを指定</li>
-<li>(オプション) source 以外の場所に生成した場合 dub.json の <code>sourcePaths</code> <code>importPaths</code> に追加</li>
-</ul>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-dub.json" data-lang="dub.json">{
-    <span style="color:#f92672">&#34;preBuildCommands&#34;</span>: [
-        <span style="color:#e6db74">&#34;dub fetch dpp --version=0.4.0&#34;</span>,
-        <span style="color:#e6db74">&#34;dub run dpp -- --preprocess-only source/opencl.dpp&#34;</span>
+</code></pre><p>ちなみにdmdを使うとコンパイラのバグで異常終了します(!?)．</p><h2 id=例2-dub-との連携>例2: DUB との連携</h2><p>現状，簡単にDUBと連携する方法はないです．ただしdppは中間のD言語ヘッダーを出力できるので，preBuildCommandsを使って追加設定をするなど連携できます</p><ul><li>dub.json の <code>preBuildCommands</code> で dpp をインストールし・ヘッダーを自動生成</li><li><code>libs</code> にリンクするライブラリを指定</li><li>(オプション) source 以外の場所に生成した場合 dub.json の <code>sourcePaths</code> <code>importPaths</code> に追加</li></ul><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-dub.json data-lang=dub.json>{
+    <span style=color:#f92672>&#34;preBuildCommands&#34;</span>: [
+        <span style=color:#e6db74>&#34;dub fetch dpp --version=0.4.0&#34;</span>,
+        <span style=color:#e6db74>&#34;dub run dpp -- --preprocess-only source/opencl.dpp&#34;</span>
     ],
-    <span style="color:#f92672">&#34;libs&#34;</span>: [<span style="color:#e6db74">&#34;OpenCL&#34;</span>],
-    <span style="color:#f92672">&#34;authors&#34;</span>: [<span style="color:#e6db74">&#34;karita&#34;</span>],
-    <span style="color:#f92672">&#34;copyright&#34;</span>: <span style="color:#e6db74">&#34;Copyright © 2019, karita&#34;</span>,
-    <span style="color:#f92672">&#34;description&#34;</span>: <span style="color:#e6db74">&#34;dpp demo for OpenCL&#34;</span>,
-    <span style="color:#f92672">&#34;license&#34;</span>: <span style="color:#e6db74">&#34;BSL-1.0&#34;</span>,
-    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;dpp-opencl&#34;</span>
+    <span style=color:#f92672>&#34;libs&#34;</span>: [<span style=color:#e6db74>&#34;OpenCL&#34;</span>],
+    <span style=color:#f92672>&#34;authors&#34;</span>: [<span style=color:#e6db74>&#34;karita&#34;</span>],
+    <span style=color:#f92672>&#34;copyright&#34;</span>: <span style=color:#e6db74>&#34;Copyright © 2019, karita&#34;</span>,
+    <span style=color:#f92672>&#34;description&#34;</span>: <span style=color:#e6db74>&#34;dpp demo for OpenCL&#34;</span>,
+    <span style=color:#f92672>&#34;license&#34;</span>: <span style=color:#e6db74>&#34;BSL-1.0&#34;</span>,
+    <span style=color:#f92672>&#34;name&#34;</span>: <span style=color:#e6db74>&#34;dpp-opencl&#34;</span>
 }
-</code></pre></div><p>以下のコマンドで私の用意したプロジェクトがビルド出来るはずです．ちなみにこの例では，ベクトルの足し算をGPU上で行う少し長めのコードになっています．</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">$ git clone https://github.com/ShigekiKarita/dpp-opencl
+</code></pre></div><p>以下のコマンドで私の用意したプロジェクトがビルド出来るはずです．ちなみにこの例では，ベクトルの足し算をGPU上で行う少し長めのコードになっています．</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash>$ git clone https://github.com/ShigekiKarita/dpp-opencl
 $ cd dpp-opencl
-$ dub run --compiler<span style="color:#f92672">=</span>ldc2
+$ dub run --compiler<span style=color:#f92672>=</span>ldc2
 SUCCESS!!
 </code></pre></div><p>プロジェクトはGitHubに公開してます、CIスクリプトにpoclのインストールも記載しています。
-<a href="https://github.com/ShigekiKarita/dpp-opencl">https://github.com/ShigekiKarita/dpp-opencl</a></p>
-<h2 id="おわりに">おわりに</h2>
-<p>私自身は日々 dpp にお世話になっています．たとえば今回紹介した OpenCL だけでなく CUDA のヘッダーなども完璧に動きます．個人的には半年前に OpenCL の SIMD 宣言の翻訳が変というマイナーすぎるバグを報告してみたら，すぐ fix してもらった経験があり，大変感謝しています．</p>
-<p>それでは皆さん，快適なD言語生活を!</p>
-
-		</div>
-		
-<div class="post__tags tags clearfix">
-	<svg class="tags__icon icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5 0 11V3C0 1.5.8.8.8.8S1.5 0 3 0h8c1.5 0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>
-	<ul class="tags__list">
-		<li class="tags__item"><a class="tags__link btn" href="/log/tags/d/" rel="tag">D</a></li>
-	</ul>
-</div>
-	</article>
-</main>
-
-<div class="authorbox clearfix">
-	<figure class="authorbox__avatar">
-		<img alt="Shigeki Karita avatar" src="/log/img/avatar.jpg" class="avatar" height="90" width="90">
-	</figure>
-	<div class="authorbox__header">
-		<span class="authorbox__name">About Shigeki Karita</span>
-	</div>
-	<div class="authorbox__description">
-		D言語と日々の研究について雑記
-	</div>
-</div>
-
-<nav class="post-nav flex">
-	<div class="post-nav__item post-nav__item--prev">
-		<a class="post-nav__link" href="/log/posts/arduino-midi/" rel="prev"><span class="post-nav__caption">«&thinsp;Previous</span><p class="post-nav__post-title">Arduino UNOでMIDIエクスプレッションペダル自作</p></a>
-	</div>
-	<div class="post-nav__item post-nav__item--next">
-		<a class="post-nav__link" href="/log/posts/vst3-hello/" rel="next"><span class="post-nav__caption">Next&thinsp;»</span><p class="post-nav__post-title">Windows CUI環境における VST3 開発</p></a>
-	</div>
-</nav>
-
-
-			</div>
-			
-		</div>
-		<script type="text/x-mathjax-config">
+<a href=https://github.com/ShigekiKarita/dpp-opencl>https://github.com/ShigekiKarita/dpp-opencl</a></p><h2 id=おわりに>おわりに</h2><p>私自身は日々 dpp にお世話になっています．たとえば今回紹介した OpenCL だけでなく CUDA のヘッダーなども完璧に動きます．個人的には半年前に OpenCL の SIMD 宣言の翻訳が変というマイナーすぎるバグを報告してみたら，すぐ fix してもらった経験があり，大変感謝しています．</p><p>それでは皆さん，快適なD言語生活を!</p></div><div class="post__tags tags clearfix"><svg class="tags__icon icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg><ul class=tags__list><li class=tags__item><a class="tags__link btn" href=/log/tags/d/ rel=tag>D</a></li></ul></div></article></main><div class="authorbox clearfix"><figure class=authorbox__avatar><img alt="Shigeki Karita avatar" src=/log/img/avatar.jpg class=avatar height=90 width=90></figure><div class=authorbox__header><span class=authorbox__name>About Shigeki Karita</span></div><div class=authorbox__description>D言語と日々の研究について雑記</div></div><nav class="post-nav flex"><div class="post-nav__item post-nav__item--prev"><a class=post-nav__link href=/log/posts/arduino-midi/ rel=prev><span class=post-nav__caption>«&#8201;Previous</span><p class=post-nav__post-title>Arduino UNOでMIDIエクスプレッションペダル自作</p></a></div><div class="post-nav__item post-nav__item--next"><a class=post-nav__link href=/log/posts/vst3-hello/ rel=next><span class=post-nav__caption>Next&#8201;»</span><p class=post-nav__post-title>Windows CUI環境における VST3 開発</p></a></div></nav></div></div><script type=text/x-mathjax-config>
  MathJax.Hub.Config({
      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
      TeX: { equationNumbers: {autoNumber: "AMS"} }
@@ -248,25 +77,4 @@ SUCCESS!!
      }
  });
 
-</script>
-<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-
-<div style="display:table;margin: 0 auto">
-Built at Travis CI <a href="https://travis-ci.org/ShigekiKarita/log"><img src="https://travis-ci.org/ShigekiKarita/log.svg?branch=master" ></a>
-</div>
-
-
-
-
-
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<script>
- (adsbygoogle = window.adsbygoogle || []).push({
-     google_ad_client: "ca-pub-6633457078111023",
-     enable_page_level_ads: true
- });
-</script>
-
-	</div>
-<script async defer src="/log/js/menu.js"></script></body>
-</html>
+</script><script type=text/javascript async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script><div style="display:table;margin:0 auto">Built at Travis CI <a href=https://travis-ci.org/ShigekiKarita/log><img src="https://travis-ci.org/ShigekiKarita/log.svg?branch=master"></a></div><script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script><script>(adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"ca-pub-6633457078111023",enable_page_level_ads:true});</script></div><script async defer src=/log/js/menu.js></script></body></html>

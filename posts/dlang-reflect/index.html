@@ -1,393 +1,162 @@
-<!DOCTYPE html>
-<html class="no-js" lang="jp">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>D言語の実行時リフレクション - log</title>
-	<script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script>
-	<meta name="description" content="">
-	<meta property="og:title" content="D言語の実行時リフレクション" />
-<meta property="og:description" content="tl;dr この前書いたD言語の実行時リフレクション，実行時の文字列からフィールドを呼び出す getter を書き直して， setter も作ったよ． 前回の get 実装 https://shigekikarita.github.io/log/posts/hugo-post-tips/ 前回の実装では" />
-<meta property="og:type" content="article" />
-<meta property="og:url" content="https://shigekikarita.github.io/log/posts/dlang-reflect/" />
-<meta property="article:published_time" content="2019-05-02T20:27:21+09:00" />
-<meta property="article:modified_time" content="2019-05-02T20:27:21+09:00" />
+<!doctype html><html class=no-js lang=jp><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><title>D言語の実行時リフレクション - log</title><script>(function(d,e){d[e]=d[e].replace("no-js","js");})(document.documentElement,"className");</script><meta name=description content><meta property="og:title" content="D言語の実行時リフレクション"><meta property="og:description" content="tl;dr この前書いたD言語の実行時リフレクション，実行時の文字列からフィールドを呼び出す getter を書き直して， setter も作ったよ． 前回の get 実装 https://shigekikarita.github.io/log/posts/hugo-post-tips/ 前回の実装では"><meta property="og:type" content="article"><meta property="og:url" content="https://shigekikarita.github.io/log/posts/dlang-reflect/"><meta property="article:published_time" content="2019-05-02T20:27:21+09:00"><meta property="article:modified_time" content="2019-05-02T20:27:21+09:00"><meta name=twitter:card content="summary"><meta name=twitter:title content="D言語の実行時リフレクション"><meta name=twitter:description content="tl;dr この前書いたD言語の実行時リフレクション，実行時の文字列からフィールドを呼び出す getter を書き直して， setter も作ったよ． 前回の get 実装 https://shigekikarita.github.io/log/posts/hugo-post-tips/ 前回の実装では"><link rel=dns-prefetch href=//fonts.googleapis.com><link rel=dns-prefetch href=//fonts.gstatic.com><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700"><link rel=stylesheet href=/log/css/style.css><link rel=stylesheet href=/log/css/custom.css><link rel="shortcut icon" href=/log/favicon.ico><script type=application/javascript>var doNotTrack=false;if(!doNotTrack){window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;ga('create','UA-139201189-1','auto');ga('send','pageview');}</script><script async src=https://www.google-analytics.com/analytics.js></script></head><body class=body><div class="container container--outer"><header class=header><div class=container><div class=logo><a class=logo__link href=/log/ title=log rel=home><div class=logo__title>log</div></a></div><nav class=menu><button class=menu__btn aria-haspopup=true aria-expanded=false tabindex=0>
+<span class=menu__btn-title tabindex=-1>Menu</span></button><ul class=menu__list><li class=menu__item><a class=menu__link href=https://shigekikarita.github.io>home</a></li><li class=menu__item><a class=menu__link href=https://github.com/ShigekiKarita/log>github</a></li><li class=menu__item><a class=menu__link href=https://travis-ci.org/ShigekiKarita/log>travis</a></li></ul></nav></div></header><div class="wrapper flex"><div class=primary><main class=main role=main><article class=post><header class=post__header><h1 class=post__title>D言語の実行時リフレクション</h1><div class="post__meta meta"><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2019-05-02T20:27:21>2019-05-02</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/log/categories/programming rel=category>Programming</a></span></div></div></header><div class="post__toc toc"><div class=toc__title>Page content</div><div class=toc__menu><nav id=TableOfContents><ul><li><a href=#headline-1>tl;dr</a></li><li><a href=#headline-2>前回の get 実装</a></li><li><a href=#headline-3>新しい get 実装</a></li><li><a href=#headline-4>set 実装</a></li><li><a href=#headline-5>全体のコード</a></li><li><a href=#headline-6>力こそパワー</a></li></ul></nav></div></div><div class="content post__content clearfix"><h3 id=headline-1>tl;dr</h3><p>この前書いたD言語の実行時リフレクション，実行時の文字列からフィールドを呼び出す getter を書き直して， setter も作ったよ．</p><h3 id=headline-2>前回の get 実装</h3><p><a href=https://shigekikarita.github.io/log/posts/hugo-post-tips/>https://shigekikarita.github.io/log/posts/hugo-post-tips/</a></p><p>前回の実装では foreach を回して実行時文字列とコンパイル時フィールド名が一致する場合，そのフィールドをVariantで型消去して返すというものでした．</p><div class="src src-d"><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-d data-lang=d><span style=color:#75715e>/// 型Tの全メンバのうち最大のサイズを返す
+</span><span style=color:#75715e></span><span style=color:#66d9ef>auto</span> <span style=color:#a6e22e>maxFieldSize</span><span style=color:#f92672>(</span>T<span style=color:#f92672>)()</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>ulong</span> size <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span><span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>foreach</span> <span style=color:#f92672>(</span>m<span style=color:#f92672>;</span> T<span style=color:#f92672>.</span><span style=color:#a6e22e>init</span><span style=color:#f92672>.</span><span style=color:#a6e22e>tupleof</span><span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+        <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>size <span style=color:#f92672>&lt;</span> m<span style=color:#f92672>.</span><span style=color:#a6e22e>sizeof</span><span style=color:#f92672>)</span> size <span style=color:#f92672>=</span> m<span style=color:#f92672>.</span><span style=color:#a6e22e>sizeof</span><span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span>
+    <span style=color:#66d9ef>return</span> size<span style=color:#f92672>;</span>
+<span style=color:#f92672>}</span>
 
-	<meta name="twitter:card" content="summary"/>
-<meta name="twitter:title" content="D言語の実行時リフレクション"/>
-<meta name="twitter:description" content="tl;dr この前書いたD言語の実行時リフレクション，実行時の文字列からフィールドを呼び出す getter を書き直して， setter も作ったよ． 前回の get 実装 https://shigekikarita.github.io/log/posts/hugo-post-tips/ 前回の実装では"/>
+<span style=color:#75715e>/// attr と同じ名前のメンバをVariantに入れて返す
+</span><span style=color:#75715e></span><span style=color:#66d9ef>auto</span> <span style=color:#a6e22e>fieldByName</span><span style=color:#f92672>(</span>T<span style=color:#f92672>)(</span>ref T x<span style=color:#f92672>,</span> <span style=color:#66d9ef>string</span> attr<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#f92672>import</span> std.variant <span style=color:#f92672>:</span> VariantN<span style=color:#f92672>;</span>
+    VariantN<span style=color:#f92672>!(</span>maxFieldSize<span style=color:#f92672>!</span>T<span style=color:#f92672>)</span> v<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>foreach</span> <span style=color:#f92672>(</span>a<span style=color:#f92672>;</span> __traits<span style=color:#f92672>(</span>allMembers<span style=color:#f92672>,</span> T<span style=color:#f92672>)){</span> 
+        <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>a <span style=color:#f92672>==</span> attr<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+            v <span style=color:#f92672>=</span> __traits<span style=color:#f92672>(</span>getMember<span style=color:#f92672>,</span> x<span style=color:#f92672>,</span> a<span style=color:#f92672>);</span>
+            <span style=color:#66d9ef>break</span><span style=color:#f92672>;</span>
+        <span style=color:#f92672>}</span>
+    <span style=color:#f92672>}</span>
+    <span style=color:#66d9ef>return</span> v<span style=color:#f92672>;</span>
+<span style=color:#f92672>}</span>
 
-	<link rel="dns-prefetch" href="//fonts.googleapis.com">
-	<link rel="dns-prefetch" href="//fonts.gstatic.com">
-	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700">
-	<link rel="stylesheet" href="/log/css/style.css">
-	<link rel="stylesheet" href="/log/css/custom.css">
-	<link rel="shortcut icon" href="/log/favicon.ico">
-		
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-	ga('create', 'UA-139201189-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
-<script async src='https://www.google-analytics.com/analytics.js'></script>
+<span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Hoge</span> <span style=color:#f92672>{</span>
+	<span style=color:#66d9ef>int</span> N<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>string</span> S<span style=color:#f92672>;</span>
+<span style=color:#f92672>}</span>
 
-</head>
-<body class="body">
-	<div class="container container--outer">
-		<header class="header">
-	<div class="container">
-		<div class="logo">
-			<a class="logo__link" href="/log/" title="log" rel="home">
-				<div class="logo__title">log</div>
-				
-			</a>
-		</div>
-		
-<nav class="menu">
-	<button class="menu__btn" aria-haspopup="true" aria-expanded="false" tabindex="0">
-		<span class="menu__btn-title" tabindex="-1">Menu</span>
-	</button>
-	<ul class="menu__list">
-		<li class="menu__item">
-			<a class="menu__link" href="https://shigekikarita.github.io">home</a>
-		</li>
-		<li class="menu__item">
-			<a class="menu__link" href="https://github.com/ShigekiKarita/log">github</a>
-		</li>
-		<li class="menu__item">
-			<a class="menu__link" href="https://travis-ci.org/ShigekiKarita/log">travis</a>
-		</li>
-	</ul>
-</nav>
+unittest <span style=color:#f92672>{</span>
+    Hoge h <span style=color:#f92672>=</span> <span style=color:#f92672>{</span><span style=color:#ae81ff>10</span><span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;aa&#34;</span><span style=color:#f92672>};</span>
 
-	</div>
-</header>
-		<div class="wrapper flex">
-			<div class="primary">
-			
-<main class="main" role="main">
-	<article class="post">
-		<header class="post__header">
-			<h1 class="post__title">D言語の実行時リフレクション</h1>
-			<div class="post__meta meta">
-<div class="meta__item-datetime meta__item">
-	<svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg>
-	<time class="meta__text" datetime="2019-05-02T20:27:21">2019-05-02</time>
-</div>
+    <span style=color:#66d9ef>assert</span><span style=color:#f92672>(</span>h<span style=color:#f92672>.</span><span style=color:#a6e22e>fieldByName</span><span style=color:#f92672>(</span>name<span style=color:#f92672>)</span> <span style=color:#f92672>==</span> v<span style=color:#f92672>);</span>
+    <span style=color:#66d9ef>assert</span><span style=color:#f92672>(</span>h<span style=color:#f92672>.</span><span style=color:#a6e22e>fieldByName</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;N&#34;</span><span style=color:#f92672>)</span> <span style=color:#f92672>==</span> <span style=color:#ae81ff>10</span><span style=color:#f92672>);</span>
+    <span style=color:#66d9ef>assert</span><span style=color:#f92672>(</span>h<span style=color:#f92672>.</span><span style=color:#a6e22e>fieldByName</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;S&#34;</span><span style=color:#f92672>)</span> <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;aa&#34;</span><span style=color:#f92672>);</span>
+<span style=color:#f92672>}</span>
+</code></pre></div></div><h3 id=headline-3>新しい get 実装</h3><p><a href=https://twitter.com/lempiji/status/1123201897710514176>https://twitter.com/lempiji/status/1123201897710514176</a></p><p>twitterで <code>switch</code> + <code>static foreach</code> で実装した方が効率良いよと教えてもらったのでやってみました．</p><div class="src src-d"><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-d data-lang=d><span style=color:#66d9ef>auto</span> <span style=color:#a6e22e>get</span><span style=color:#f92672>(</span>T<span style=color:#f92672>)(</span>ref T x<span style=color:#f92672>,</span> <span style=color:#66d9ef>string</span> attr<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#f92672>import</span> std.traits <span style=color:#f92672>:</span> isFunction<span style=color:#f92672>;</span>
 
-<div class="meta__item-categories meta__item">
-	<svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2l1 2h8v11h-16v-13z"/></svg>
-	<span class="meta__text"><a class="meta__link" href="/log/categories/programming" rel="category">Programming</a></span>
-</div>
-</div>
-		</header>
-<div class="post__toc toc">
-	<div class="toc__title">Page content</div>
-	<div class="toc__menu">
-		<nav id="TableOfContents">
-<ul>
-<li><a href="#headline-1">tl;dr</a>
-</li>
-<li><a href="#headline-2">前回の get 実装</a>
-</li>
-<li><a href="#headline-3">新しい get 実装</a>
-</li>
-<li><a href="#headline-4">set 実装</a>
-</li>
-<li><a href="#headline-5">全体のコード</a>
-</li>
-<li><a href="#headline-6">力こそパワー</a>
-</li>
-</ul>
-</nav>
-	</div>
-</div>
-<div class="content post__content clearfix">
-			
-<h3 id="headline-1">
-tl;dr
-</h3>
-<p>
-この前書いたD言語の実行時リフレクション，実行時の文字列からフィールドを呼び出す getter を書き直して， setter も作ったよ．
-</p>
-<h3 id="headline-2">
-前回の get 実装
-</h3>
-<p>
-<a href="https://shigekikarita.github.io/log/posts/hugo-post-tips/">https://shigekikarita.github.io/log/posts/hugo-post-tips/</a>
-</p>
-<p>
-前回の実装では foreach を回して実行時文字列とコンパイル時フィールド名が一致する場合，そのフィールドをVariantで型消去して返すというものでした．
-</p>
-<div class="src src-d">
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-d" data-lang="d"><span style="color:#75715e">/// 型Tの全メンバのうち最大のサイズを返す
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">auto</span> <span style="color:#a6e22e">maxFieldSize</span><span style="color:#f92672">(</span>T<span style="color:#f92672">)()</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">ulong</span> size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">foreach</span> <span style="color:#f92672">(</span>m<span style="color:#f92672">;</span> T<span style="color:#f92672">.</span><span style="color:#a6e22e">init</span><span style="color:#f92672">.</span><span style="color:#a6e22e">tupleof</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>size <span style="color:#f92672">&lt;</span> m<span style="color:#f92672">.</span><span style="color:#a6e22e">sizeof</span><span style="color:#f92672">)</span> size <span style="color:#f92672">=</span> m<span style="color:#f92672">.</span><span style="color:#a6e22e">sizeof</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-    <span style="color:#66d9ef">return</span> size<span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
+    VariantN<span style=color:#f92672>!(</span>maxFieldSize<span style=color:#f92672>!</span>T<span style=color:#f92672>)</span> v<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>switch</span> <span style=color:#f92672>(</span>attr<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>static</span> <span style=color:#a6e22e>foreach</span> <span style=color:#f92672>(</span>a<span style=color:#f92672>;</span> __traits<span style=color:#f92672>(</span>allMembers<span style=color:#f92672>,</span> T<span style=color:#f92672>))</span> <span style=color:#f92672>{</span>
+        <span style=color:#66d9ef>case</span> a<span style=color:#f92672>:</span>
+            <span style=color:#66d9ef>static</span> <span style=color:#a6e22e>if</span> <span style=color:#f92672>(</span>isFunction<span style=color:#f92672>!(</span>__traits<span style=color:#f92672>(</span>getMember<span style=color:#f92672>,</span> x<span style=color:#f92672>,</span> a<span style=color:#f92672>)))</span> <span style=color:#f92672>{</span>
+                v <span style=color:#f92672>=</span> <span style=color:#f92672>&amp;</span> __traits<span style=color:#f92672>(</span>getMember<span style=color:#f92672>,</span> x<span style=color:#f92672>,</span> a<span style=color:#f92672>);</span>
+            <span style=color:#f92672>}</span> <span style=color:#66d9ef>else</span> <span style=color:#f92672>{</span>
+                v <span style=color:#f92672>=</span> __traits<span style=color:#f92672>(</span>getMember<span style=color:#f92672>,</span> x<span style=color:#f92672>,</span> a<span style=color:#f92672>);</span>
+            <span style=color:#f92672>}</span>
+            <span style=color:#66d9ef>return</span> v<span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span>
+    <span style=color:#66d9ef>default</span><span style=color:#f92672>:</span>
+        <span style=color:#66d9ef>return</span> v<span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+</code></pre></div></div><p><code>static foreach</code> はスコープを作らないので展開後のコードは <code>case a:</code> を何個か並べたものになるのですが，これは中々パワーっていう感じがして厳ついですね．あと関数のときは即時評価されないよう関数ポインタにして格納するようにしました．</p><p>あとパワー系の実装といえば <strong>コンパイル時連想配列</strong> を使う方法も考えました．</p><div class="src src-d"><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-d data-lang=d><span style=color:#66d9ef>auto</span> <span style=color:#a6e22e>get</span><span style=color:#f92672>(</span>T<span style=color:#f92672>)(</span>ref T x<span style=color:#f92672>,</span> <span style=color:#66d9ef>string</span> attr<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>alias</span> V <span style=color:#f92672>=</span> VariantN<span style=color:#f92672>!(</span>maxFieldSize<span style=color:#f92672>!</span>T<span style=color:#f92672>);</span>
+    <span style=color:#66d9ef>alias</span> F <span style=color:#f92672>=</span> V <span style=color:#a6e22e>function</span><span style=color:#f92672>(</span>ref T<span style=color:#f92672>)</span>
+    <span style=color:#75715e>// コンパイル時連想配列
+</span><span style=color:#75715e></span>    <span style=color:#66d9ef>enum</span> dict <span style=color:#f92672>=</span> <span style=color:#f92672>{</span>
+        F<span style=color:#f92672>[</span><span style=color:#66d9ef>string</span><span style=color:#f92672>]</span> ret<span style=color:#f92672>;</span>
+        <span style=color:#66d9ef>static</span> <span style=color:#a6e22e>foreach</span> <span style=color:#f92672>(</span>a<span style=color:#f92672>;</span> __traits<span style=color:#f92672>(</span>allMembers<span style=color:#f92672>,</span> T<span style=color:#f92672>))</span> <span style=color:#f92672>{</span>
+            ret<span style=color:#f92672>[</span>a<span style=color:#f92672>]</span> <span style=color:#f92672>=</span> <span style=color:#f92672>(</span>ref T t<span style=color:#f92672>)</span> <span style=color:#f92672>{</span> V u<span style=color:#f92672>;</span> u <span style=color:#f92672>=</span> __traits<span style=color:#f92672>(</span>getMember<span style=color:#f92672>,</span> t<span style=color:#f92672>,</span> a<span style=color:#f92672>);</span> <span style=color:#66d9ef>return</span> u<span style=color:#f92672>;</span> <span style=color:#f92672>};</span>
+        <span style=color:#f92672>}</span>
+        <span style=color:#66d9ef>return</span> ret<span style=color:#f92672>;</span>
+    <span style=color:#f92672>}();</span>
+    <span style=color:#66d9ef>return</span> dict<span style=color:#f92672>[</span>attr<span style=color:#f92672>](</span>x<span style=color:#f92672>);</span>
+</code></pre></div></div><p>これは <code>switch</code> の例では「 <code>switch</code> をコンパイラがジャンプテーブルに変換して定数オーダでフィールドを探索できること」を期待しているのですが，連想配列を自力で用意することで定数オーダを実現できます．現実的にはコードサイズは膨れ上がりそうなので，フラグで速度やサイズを判断できるコンパイラに任せる方がいいと思います．</p><h3 id=headline-4>set 実装</h3><p><code>switch</code> を使って同じ雰囲気で setter も作れます．</p><div class="src src-d"><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-d data-lang=d>ref <span style=color:#a6e22e>set</span><span style=color:#f92672>(</span>V<span style=color:#f92672>,</span> T<span style=color:#f92672>)(</span>ref T x<span style=color:#f92672>,</span> <span style=color:#66d9ef>string</span> attr<span style=color:#f92672>,</span> V val<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>switch</span> <span style=color:#f92672>(</span>attr<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>static</span> <span style=color:#a6e22e>foreach</span> <span style=color:#f92672>(</span>a<span style=color:#f92672>;</span> __traits<span style=color:#f92672>(</span>allMembers<span style=color:#f92672>,</span> T<span style=color:#f92672>)){</span>
+        <span style=color:#66d9ef>static</span> <span style=color:#a6e22e>if</span> <span style=color:#f92672>(</span><span style=color:#66d9ef>is</span><span style=color:#f92672>(</span>typeof<span style=color:#f92672>(</span>__traits<span style=color:#f92672>(</span>getMember<span style=color:#f92672>,</span> x<span style=color:#f92672>,</span> a<span style=color:#f92672>))</span> <span style=color:#f92672>:</span> V<span style=color:#f92672>))</span> <span style=color:#f92672>{</span>
+            <span style=color:#66d9ef>case</span> a<span style=color:#f92672>:</span>
+                __traits<span style=color:#f92672>(</span>getMember<span style=color:#f92672>,</span> x<span style=color:#f92672>,</span> a<span style=color:#f92672>)</span> <span style=color:#f92672>=</span> val<span style=color:#f92672>;</span>
+                <span style=color:#66d9ef>return</span> x<span style=color:#f92672>;</span>
+        <span style=color:#f92672>}</span>
+    <span style=color:#f92672>}</span>
+    <span style=color:#66d9ef>default</span><span style=color:#f92672>:</span>
+        <span style=color:#66d9ef>assert</span><span style=color:#f92672>(</span><span style=color:#66d9ef>false</span><span style=color:#f92672>,</span> attr <span style=color:#f92672>~</span> <span style=color:#e6db74>&#34; not found&#34;</span><span style=color:#f92672>);</span>
+    <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
+</code></pre></div></div><p>注意すべきなのは <code>static if</code> の部分がないと，次のようなコードが展開されてしまいコンパイルエラーになります．ちなみに <code>static foreach</code> と同様にスコープを作りません．</p><div class="src src-d"><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-d data-lang=d><span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Hoge</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>int</span> i<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>string</span> s<span style=color:#f92672>;</span>
+<span style=color:#f92672>}</span>
 
-<span style="color:#75715e">/// attr と同じ名前のメンバをVariantに入れて返す
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">auto</span> <span style="color:#a6e22e">fieldByName</span><span style="color:#f92672">(</span>T<span style="color:#f92672">)(</span>ref T x<span style="color:#f92672">,</span> <span style="color:#66d9ef">string</span> attr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#f92672">import</span> std.variant <span style="color:#f92672">:</span> VariantN<span style="color:#f92672">;</span>
-    VariantN<span style="color:#f92672">!(</span>maxFieldSize<span style="color:#f92672">!</span>T<span style="color:#f92672">)</span> v<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">foreach</span> <span style="color:#f92672">(</span>a<span style="color:#f92672">;</span> __traits<span style="color:#f92672">(</span>allMembers<span style="color:#f92672">,</span> T<span style="color:#f92672">)){</span> 
-        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>a <span style="color:#f92672">==</span> attr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-            v <span style="color:#f92672">=</span> __traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> x<span style="color:#f92672">,</span> a<span style="color:#f92672">);</span>
-            <span style="color:#66d9ef">break</span><span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-    <span style="color:#f92672">}</span>
-    <span style="color:#66d9ef">return</span> v<span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
+<span style=color:#75715e>// インスタンス化された set 関数
+</span><span style=color:#75715e></span>ref <span style=color:#a6e22e>set</span><span style=color:#f92672>(</span>ref Hoge x<span style=color:#f92672>,</span> <span style=color:#66d9ef>string</span> attr<span style=color:#f92672>,</span> <span style=color:#66d9ef>int</span> val<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>switch</span> <span style=color:#f92672>(</span>attr<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>case</span> <span style=color:#e6db74>&#34;i&#34;</span><span style=color:#f92672>:</span>
+        x<span style=color:#f92672>.</span><span style=color:#a6e22e>i</span> <span style=color:#f92672>=</span> val<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>case</span> <span style=color:#e6db74>&#34;s&#34;</span><span style=color:#f92672>:</span>
+        x<span style=color:#f92672>.</span><span style=color:#a6e22e>s</span> <span style=color:#f92672>=</span> val<span style=color:#f92672>;</span> <span style=color:#75715e>// string に int は代入できない
+</span><span style=color:#75715e></span>    <span style=color:#f92672>...</span>
+<span style=color:#f92672>}</span>
+</code></pre></div></div><h3 id=headline-5>全体のコード</h3><div class="src src-d"><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-d data-lang=d><span style=color:#f92672>import</span> std.variant<span style=color:#f92672>;</span>
 
-<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Hoge</span> <span style="color:#f92672">{</span>
-	<span style="color:#66d9ef">int</span> N<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">string</span> S<span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
+<span style=color:#66d9ef>auto</span> <span style=color:#a6e22e>maxFieldSize</span><span style=color:#f92672>(</span>T<span style=color:#f92672>)()</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>ulong</span> size <span style=color:#f92672>=</span> <span style=color:#ae81ff>0</span><span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>foreach</span> <span style=color:#f92672>(</span>m<span style=color:#f92672>;</span> T<span style=color:#f92672>.</span><span style=color:#a6e22e>init</span><span style=color:#f92672>.</span><span style=color:#a6e22e>tupleof</span><span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+        <span style=color:#66d9ef>if</span> <span style=color:#f92672>(</span>size <span style=color:#f92672>&lt;</span> m<span style=color:#f92672>.</span><span style=color:#a6e22e>sizeof</span><span style=color:#f92672>)</span> size <span style=color:#f92672>=</span> m<span style=color:#f92672>.</span><span style=color:#a6e22e>sizeof</span><span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span>
+    <span style=color:#66d9ef>return</span> size<span style=color:#f92672>;</span>
+<span style=color:#f92672>}</span>
 
-unittest <span style="color:#f92672">{</span>
-    Hoge h <span style="color:#f92672">=</span> <span style="color:#f92672">{</span><span style="color:#ae81ff">10</span><span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;aa&#34;</span><span style="color:#f92672">};</span>
+<span style=color:#66d9ef>auto</span> <span style=color:#a6e22e>get</span><span style=color:#f92672>(</span>T<span style=color:#f92672>)(</span>ref T x<span style=color:#f92672>,</span> <span style=color:#66d9ef>string</span> attr<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#f92672>import</span> std.traits <span style=color:#f92672>:</span> isFunction<span style=color:#f92672>;</span>
 
-    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">fieldByName</span><span style="color:#f92672">(</span>name<span style="color:#f92672">)</span> <span style="color:#f92672">==</span> v<span style="color:#f92672">);</span>
-    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">fieldByName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;N&#34;</span><span style="color:#f92672">)</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">10</span><span style="color:#f92672">);</span>
-    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">fieldByName</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;S&#34;</span><span style="color:#f92672">)</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;aa&#34;</span><span style="color:#f92672">);</span>
-<span style="color:#f92672">}</span>
-</code></pre></div>
-</div>
-<h3 id="headline-3">
-新しい get 実装
-</h3>
-<p>
-<a href="https://twitter.com/lempiji/status/1123201897710514176">https://twitter.com/lempiji/status/1123201897710514176</a>
-</p>
-<p>
-twitterで <code>switch</code> + <code>static foreach</code> で実装した方が効率良いよと教えてもらったのでやってみました．
-</p>
-<div class="src src-d">
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-d" data-lang="d"><span style="color:#66d9ef">auto</span> <span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>T<span style="color:#f92672">)(</span>ref T x<span style="color:#f92672">,</span> <span style="color:#66d9ef">string</span> attr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#f92672">import</span> std.traits <span style="color:#f92672">:</span> isFunction<span style="color:#f92672">;</span>
+    VariantN<span style=color:#f92672>!(</span>maxFieldSize<span style=color:#f92672>!</span>T<span style=color:#f92672>)</span> v<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>switch</span> <span style=color:#f92672>(</span>attr<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>static</span> <span style=color:#a6e22e>foreach</span> <span style=color:#f92672>(</span>a<span style=color:#f92672>;</span> __traits<span style=color:#f92672>(</span>allMembers<span style=color:#f92672>,</span> T<span style=color:#f92672>))</span> <span style=color:#f92672>{</span>
+        <span style=color:#66d9ef>case</span> a<span style=color:#f92672>:</span>
+            <span style=color:#66d9ef>static</span> <span style=color:#a6e22e>if</span> <span style=color:#f92672>(</span>isFunction<span style=color:#f92672>!(</span>__traits<span style=color:#f92672>(</span>getMember<span style=color:#f92672>,</span> x<span style=color:#f92672>,</span> a<span style=color:#f92672>)))</span> <span style=color:#f92672>{</span>
+                v <span style=color:#f92672>=</span> <span style=color:#f92672>&amp;</span> __traits<span style=color:#f92672>(</span>getMember<span style=color:#f92672>,</span> x<span style=color:#f92672>,</span> a<span style=color:#f92672>);</span>
+            <span style=color:#f92672>}</span> <span style=color:#66d9ef>else</span> <span style=color:#f92672>{</span>
+                v <span style=color:#f92672>=</span> __traits<span style=color:#f92672>(</span>getMember<span style=color:#f92672>,</span> x<span style=color:#f92672>,</span> a<span style=color:#f92672>);</span>
+            <span style=color:#f92672>}</span>
+            <span style=color:#66d9ef>return</span> v<span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span>
+    <span style=color:#66d9ef>default</span><span style=color:#f92672>:</span>
+        <span style=color:#66d9ef>return</span> v<span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
 
-    VariantN<span style="color:#f92672">!(</span>maxFieldSize<span style="color:#f92672">!</span>T<span style="color:#f92672">)</span> v<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">switch</span> <span style="color:#f92672">(</span>attr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">static</span> <span style="color:#a6e22e">foreach</span> <span style="color:#f92672">(</span>a<span style="color:#f92672">;</span> __traits<span style="color:#f92672">(</span>allMembers<span style="color:#f92672">,</span> T<span style="color:#f92672">))</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">case</span> a<span style="color:#f92672">:</span>
-            <span style="color:#66d9ef">static</span> <span style="color:#a6e22e">if</span> <span style="color:#f92672">(</span>isFunction<span style="color:#f92672">!(</span>__traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> x<span style="color:#f92672">,</span> a<span style="color:#f92672">)))</span> <span style="color:#f92672">{</span>
-                v <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span> __traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> x<span style="color:#f92672">,</span> a<span style="color:#f92672">);</span>
-            <span style="color:#f92672">}</span> <span style="color:#66d9ef">else</span> <span style="color:#f92672">{</span>
-                v <span style="color:#f92672">=</span> __traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> x<span style="color:#f92672">,</span> a<span style="color:#f92672">);</span>
-            <span style="color:#f92672">}</span>
-            <span style="color:#66d9ef">return</span> v<span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-    <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>
-        <span style="color:#66d9ef">return</span> v<span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
-</code></pre></div>
-</div>
-<p>
-<code>static foreach</code> はスコープを作らないので展開後のコードは <code>case a:</code>  を何個か並べたものになるのですが，これは中々パワーっていう感じがして厳ついですね．あと関数のときは即時評価されないよう関数ポインタにして格納するようにしました．
-</p>
-<p>
-あとパワー系の実装といえば <strong>コンパイル時連想配列</strong> を使う方法も考えました．
-</p>
-<div class="src src-d">
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-d" data-lang="d"><span style="color:#66d9ef">auto</span> <span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>T<span style="color:#f92672">)(</span>ref T x<span style="color:#f92672">,</span> <span style="color:#66d9ef">string</span> attr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">alias</span> V <span style="color:#f92672">=</span> VariantN<span style="color:#f92672">!(</span>maxFieldSize<span style="color:#f92672">!</span>T<span style="color:#f92672">);</span>
-    <span style="color:#66d9ef">alias</span> F <span style="color:#f92672">=</span> V <span style="color:#a6e22e">function</span><span style="color:#f92672">(</span>ref T<span style="color:#f92672">)</span>
-    <span style="color:#75715e">// コンパイル時連想配列
-</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">enum</span> dict <span style="color:#f92672">=</span> <span style="color:#f92672">{</span>
-        F<span style="color:#f92672">[</span><span style="color:#66d9ef">string</span><span style="color:#f92672">]</span> ret<span style="color:#f92672">;</span>
-        <span style="color:#66d9ef">static</span> <span style="color:#a6e22e">foreach</span> <span style="color:#f92672">(</span>a<span style="color:#f92672">;</span> __traits<span style="color:#f92672">(</span>allMembers<span style="color:#f92672">,</span> T<span style="color:#f92672">))</span> <span style="color:#f92672">{</span>
-            ret<span style="color:#f92672">[</span>a<span style="color:#f92672">]</span> <span style="color:#f92672">=</span> <span style="color:#f92672">(</span>ref T t<span style="color:#f92672">)</span> <span style="color:#f92672">{</span> V u<span style="color:#f92672">;</span> u <span style="color:#f92672">=</span> __traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> t<span style="color:#f92672">,</span> a<span style="color:#f92672">);</span> <span style="color:#66d9ef">return</span> u<span style="color:#f92672">;</span> <span style="color:#f92672">};</span>
-        <span style="color:#f92672">}</span>
-        <span style="color:#66d9ef">return</span> ret<span style="color:#f92672">;</span>
-    <span style="color:#f92672">}();</span>
-    <span style="color:#66d9ef">return</span> dict<span style="color:#f92672">[</span>attr<span style="color:#f92672">](</span>x<span style="color:#f92672">);</span>
-</code></pre></div>
-</div>
-<p>
-これは <code>switch</code> の例では「 <code>switch</code> をコンパイラがジャンプテーブルに変換して定数オーダでフィールドを探索できること」を期待しているのですが，連想配列を自力で用意することで定数オーダを実現できます．現実的にはコードサイズは膨れ上がりそうなので，フラグで速度やサイズを判断できるコンパイラに任せる方がいいと思います．
-</p>
-<h3 id="headline-4">
-set 実装
-</h3>
-<p>
-<code>switch</code> を使って同じ雰囲気で setter も作れます．
-</p>
-<div class="src src-d">
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-d" data-lang="d">ref <span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>V<span style="color:#f92672">,</span> T<span style="color:#f92672">)(</span>ref T x<span style="color:#f92672">,</span> <span style="color:#66d9ef">string</span> attr<span style="color:#f92672">,</span> V val<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">switch</span> <span style="color:#f92672">(</span>attr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">static</span> <span style="color:#a6e22e">foreach</span> <span style="color:#f92672">(</span>a<span style="color:#f92672">;</span> __traits<span style="color:#f92672">(</span>allMembers<span style="color:#f92672">,</span> T<span style="color:#f92672">)){</span>
-        <span style="color:#66d9ef">static</span> <span style="color:#a6e22e">if</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">is</span><span style="color:#f92672">(</span>typeof<span style="color:#f92672">(</span>__traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> x<span style="color:#f92672">,</span> a<span style="color:#f92672">))</span> <span style="color:#f92672">:</span> V<span style="color:#f92672">))</span> <span style="color:#f92672">{</span>
-            <span style="color:#66d9ef">case</span> a<span style="color:#f92672">:</span>
-                __traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> x<span style="color:#f92672">,</span> a<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> val<span style="color:#f92672">;</span>
-                <span style="color:#66d9ef">return</span> x<span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-    <span style="color:#f92672">}</span>
-    <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>
-        <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span><span style="color:#66d9ef">false</span><span style="color:#f92672">,</span> attr <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34; not found&#34;</span><span style="color:#f92672">);</span>
-    <span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
-</code></pre></div>
-</div>
-<p>
-注意すべきなのは <code>static if</code> の部分がないと，次のようなコードが展開されてしまいコンパイルエラーになります．ちなみに <code>static foreach</code> と同様にスコープを作りません．
-</p>
-<div class="src src-d">
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-d" data-lang="d"><span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Hoge</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">int</span> i<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">string</span> s<span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
-
-<span style="color:#75715e">// インスタンス化された set 関数
-</span><span style="color:#75715e"></span>ref <span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>ref Hoge x<span style="color:#f92672">,</span> <span style="color:#66d9ef">string</span> attr<span style="color:#f92672">,</span> <span style="color:#66d9ef">int</span> val<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">switch</span> <span style="color:#f92672">(</span>attr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;i&#34;</span><span style="color:#f92672">:</span>
-        x<span style="color:#f92672">.</span><span style="color:#a6e22e">i</span> <span style="color:#f92672">=</span> val<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">case</span> <span style="color:#e6db74">&#34;s&#34;</span><span style="color:#f92672">:</span>
-        x<span style="color:#f92672">.</span><span style="color:#a6e22e">s</span> <span style="color:#f92672">=</span> val<span style="color:#f92672">;</span> <span style="color:#75715e">// string に int は代入できない
-</span><span style="color:#75715e"></span>    <span style="color:#f92672">...</span>
-<span style="color:#f92672">}</span>
-</code></pre></div>
-</div>
-<h3 id="headline-5">
-全体のコード
-</h3>
-<div class="src src-d">
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-d" data-lang="d"><span style="color:#f92672">import</span> std.variant<span style="color:#f92672">;</span>
-
-<span style="color:#66d9ef">auto</span> <span style="color:#a6e22e">maxFieldSize</span><span style="color:#f92672">(</span>T<span style="color:#f92672">)()</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">ulong</span> size <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span><span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">foreach</span> <span style="color:#f92672">(</span>m<span style="color:#f92672">;</span> T<span style="color:#f92672">.</span><span style="color:#a6e22e">init</span><span style="color:#f92672">.</span><span style="color:#a6e22e">tupleof</span><span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">if</span> <span style="color:#f92672">(</span>size <span style="color:#f92672">&lt;</span> m<span style="color:#f92672">.</span><span style="color:#a6e22e">sizeof</span><span style="color:#f92672">)</span> size <span style="color:#f92672">=</span> m<span style="color:#f92672">.</span><span style="color:#a6e22e">sizeof</span><span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-    <span style="color:#66d9ef">return</span> size<span style="color:#f92672">;</span>
-<span style="color:#f92672">}</span>
-
-<span style="color:#66d9ef">auto</span> <span style="color:#a6e22e">get</span><span style="color:#f92672">(</span>T<span style="color:#f92672">)(</span>ref T x<span style="color:#f92672">,</span> <span style="color:#66d9ef">string</span> attr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#f92672">import</span> std.traits <span style="color:#f92672">:</span> isFunction<span style="color:#f92672">;</span>
-
-    VariantN<span style="color:#f92672">!(</span>maxFieldSize<span style="color:#f92672">!</span>T<span style="color:#f92672">)</span> v<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">switch</span> <span style="color:#f92672">(</span>attr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">static</span> <span style="color:#a6e22e">foreach</span> <span style="color:#f92672">(</span>a<span style="color:#f92672">;</span> __traits<span style="color:#f92672">(</span>allMembers<span style="color:#f92672">,</span> T<span style="color:#f92672">))</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">case</span> a<span style="color:#f92672">:</span>
-            <span style="color:#66d9ef">static</span> <span style="color:#a6e22e">if</span> <span style="color:#f92672">(</span>isFunction<span style="color:#f92672">!(</span>__traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> x<span style="color:#f92672">,</span> a<span style="color:#f92672">)))</span> <span style="color:#f92672">{</span>
-                v <span style="color:#f92672">=</span> <span style="color:#f92672">&amp;</span> __traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> x<span style="color:#f92672">,</span> a<span style="color:#f92672">);</span>
-            <span style="color:#f92672">}</span> <span style="color:#66d9ef">else</span> <span style="color:#f92672">{</span>
-                v <span style="color:#f92672">=</span> __traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> x<span style="color:#f92672">,</span> a<span style="color:#f92672">);</span>
-            <span style="color:#f92672">}</span>
-            <span style="color:#66d9ef">return</span> v<span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-    <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>
-        <span style="color:#66d9ef">return</span> v<span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
-
-ref <span style="color:#a6e22e">set</span><span style="color:#f92672">(</span>V<span style="color:#f92672">,</span> T<span style="color:#f92672">)(</span>ref T x<span style="color:#f92672">,</span> <span style="color:#66d9ef">string</span> attr<span style="color:#f92672">,</span> V val<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">switch</span> <span style="color:#f92672">(</span>attr<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-    <span style="color:#66d9ef">static</span> <span style="color:#a6e22e">foreach</span> <span style="color:#f92672">(</span>a<span style="color:#f92672">;</span> __traits<span style="color:#f92672">(</span>allMembers<span style="color:#f92672">,</span> T<span style="color:#f92672">)){</span>
-        <span style="color:#66d9ef">static</span> <span style="color:#a6e22e">if</span> <span style="color:#f92672">(</span><span style="color:#66d9ef">is</span><span style="color:#f92672">(</span>typeof<span style="color:#f92672">(</span>__traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> x<span style="color:#f92672">,</span> a<span style="color:#f92672">))</span> <span style="color:#f92672">:</span> V<span style="color:#f92672">))</span> <span style="color:#f92672">{</span>
-            <span style="color:#66d9ef">case</span> a<span style="color:#f92672">:</span>
-                __traits<span style="color:#f92672">(</span>getMember<span style="color:#f92672">,</span> x<span style="color:#f92672">,</span> a<span style="color:#f92672">)</span> <span style="color:#f92672">=</span> val<span style="color:#f92672">;</span>
-                <span style="color:#66d9ef">return</span> x<span style="color:#f92672">;</span>
-        <span style="color:#f92672">}</span>
-    <span style="color:#f92672">}</span>
-    <span style="color:#66d9ef">default</span><span style="color:#f92672">:</span>
-        <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span><span style="color:#66d9ef">false</span><span style="color:#f92672">,</span> attr <span style="color:#f92672">~</span> <span style="color:#e6db74">&#34; not found&#34;</span><span style="color:#f92672">);</span>
-    <span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
+ref <span style=color:#a6e22e>set</span><span style=color:#f92672>(</span>V<span style=color:#f92672>,</span> T<span style=color:#f92672>)(</span>ref T x<span style=color:#f92672>,</span> <span style=color:#66d9ef>string</span> attr<span style=color:#f92672>,</span> V val<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>switch</span> <span style=color:#f92672>(</span>attr<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+    <span style=color:#66d9ef>static</span> <span style=color:#a6e22e>foreach</span> <span style=color:#f92672>(</span>a<span style=color:#f92672>;</span> __traits<span style=color:#f92672>(</span>allMembers<span style=color:#f92672>,</span> T<span style=color:#f92672>)){</span>
+        <span style=color:#66d9ef>static</span> <span style=color:#a6e22e>if</span> <span style=color:#f92672>(</span><span style=color:#66d9ef>is</span><span style=color:#f92672>(</span>typeof<span style=color:#f92672>(</span>__traits<span style=color:#f92672>(</span>getMember<span style=color:#f92672>,</span> x<span style=color:#f92672>,</span> a<span style=color:#f92672>))</span> <span style=color:#f92672>:</span> V<span style=color:#f92672>))</span> <span style=color:#f92672>{</span>
+            <span style=color:#66d9ef>case</span> a<span style=color:#f92672>:</span>
+                __traits<span style=color:#f92672>(</span>getMember<span style=color:#f92672>,</span> x<span style=color:#f92672>,</span> a<span style=color:#f92672>)</span> <span style=color:#f92672>=</span> val<span style=color:#f92672>;</span>
+                <span style=color:#66d9ef>return</span> x<span style=color:#f92672>;</span>
+        <span style=color:#f92672>}</span>
+    <span style=color:#f92672>}</span>
+    <span style=color:#66d9ef>default</span><span style=color:#f92672>:</span>
+        <span style=color:#66d9ef>assert</span><span style=color:#f92672>(</span><span style=color:#66d9ef>false</span><span style=color:#f92672>,</span> attr <span style=color:#f92672>~</span> <span style=color:#e6db74>&#34; not found&#34;</span><span style=color:#f92672>);</span>
+    <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
 
 
-<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Hoge</span> <span style="color:#f92672">{</span>
-	<span style="color:#66d9ef">int</span> N<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">string</span> S<span style="color:#f92672">;</span>
-    <span style="color:#66d9ef">int</span> <span style="color:#a6e22e">delegate</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span><span style="color:#f92672">)</span> f<span style="color:#f92672">;</span>
+<span style=color:#66d9ef>struct</span> <span style=color:#a6e22e>Hoge</span> <span style=color:#f92672>{</span>
+	<span style=color:#66d9ef>int</span> N<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>string</span> S<span style=color:#f92672>;</span>
+    <span style=color:#66d9ef>int</span> <span style=color:#a6e22e>delegate</span><span style=color:#f92672>(</span><span style=color:#66d9ef>int</span><span style=color:#f92672>)</span> f<span style=color:#f92672>;</span>
 
-    <span style="color:#66d9ef">auto</span> <span style="color:#a6e22e">mul</span><span style="color:#f92672">(</span><span style="color:#66d9ef">int</span> x<span style="color:#f92672">)</span> <span style="color:#f92672">{</span>
-        <span style="color:#66d9ef">return</span> N <span style="color:#f92672">*</span> x<span style="color:#f92672">;</span>
-    <span style="color:#f92672">}</span>
-<span style="color:#f92672">}</span>
+    <span style=color:#66d9ef>auto</span> <span style=color:#a6e22e>mul</span><span style=color:#f92672>(</span><span style=color:#66d9ef>int</span> x<span style=color:#f92672>)</span> <span style=color:#f92672>{</span>
+        <span style=color:#66d9ef>return</span> N <span style=color:#f92672>*</span> x<span style=color:#f92672>;</span>
+    <span style=color:#f92672>}</span>
+<span style=color:#f92672>}</span>
 
-unittest <span style="color:#f92672">{</span>
-    Hoge h <span style="color:#f92672">=</span> <span style="color:#f92672">{</span><span style="color:#ae81ff">10</span><span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;aa&#34;</span><span style="color:#f92672">};</span>
+unittest <span style=color:#f92672>{</span>
+    Hoge h <span style=color:#f92672>=</span> <span style=color:#f92672>{</span><span style=color:#ae81ff>10</span><span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;aa&#34;</span><span style=color:#f92672>};</span>
 
-    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;N&#34;</span><span style="color:#f92672">)</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">10</span><span style="color:#f92672">);</span>
-    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;S&#34;</span><span style="color:#f92672">)</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;aa&#34;</span><span style="color:#f92672">);</span>
-    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;N&#34;</span><span style="color:#f92672">)</span> <span style="color:#f92672">*</span> <span style="color:#ae81ff">2</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">20</span><span style="color:#f92672">);</span>
-    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;mul&#34;</span><span style="color:#f92672">)(</span><span style="color:#ae81ff">10</span><span style="color:#f92672">)</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">100</span><span style="color:#f92672">);</span>
+    <span style=color:#66d9ef>assert</span><span style=color:#f92672>(</span>h<span style=color:#f92672>.</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;N&#34;</span><span style=color:#f92672>)</span> <span style=color:#f92672>==</span> <span style=color:#ae81ff>10</span><span style=color:#f92672>);</span>
+    <span style=color:#66d9ef>assert</span><span style=color:#f92672>(</span>h<span style=color:#f92672>.</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;S&#34;</span><span style=color:#f92672>)</span> <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;aa&#34;</span><span style=color:#f92672>);</span>
+    <span style=color:#66d9ef>assert</span><span style=color:#f92672>(</span>h<span style=color:#f92672>.</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;N&#34;</span><span style=color:#f92672>)</span> <span style=color:#f92672>*</span> <span style=color:#ae81ff>2</span> <span style=color:#f92672>==</span> <span style=color:#ae81ff>20</span><span style=color:#f92672>);</span>
+    <span style=color:#66d9ef>assert</span><span style=color:#f92672>(</span>h<span style=color:#f92672>.</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;mul&#34;</span><span style=color:#f92672>)(</span><span style=color:#ae81ff>10</span><span style=color:#f92672>)</span> <span style=color:#f92672>==</span> <span style=color:#ae81ff>100</span><span style=color:#f92672>);</span>
 
-    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;N&#34;</span><span style="color:#f92672">,</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">).</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;N&#34;</span><span style="color:#f92672">)</span> <span style="color:#f92672">==</span> <span style="color:#ae81ff">1</span><span style="color:#f92672">);</span>
-    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;S&#34;</span><span style="color:#f92672">,</span> <span style="color:#e6db74">&#34;hi&#34;</span><span style="color:#f92672">).</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;S&#34;</span><span style="color:#f92672">)</span> <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;hi&#34;</span><span style="color:#f92672">);</span>
-    <span style="color:#66d9ef">assert</span><span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">set</span><span style="color:#f92672">!(</span>typeof<span style="color:#f92672">(</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">f</span><span style="color:#f92672">))(</span><span style="color:#e6db74">&#34;f&#34;</span><span style="color:#f92672">,</span> <span style="color:#f92672">&amp;</span>h<span style="color:#f92672">.</span><span style="color:#a6e22e">mul</span><span style="color:#f92672">).</span><span style="color:#a6e22e">get</span><span style="color:#f92672">(</span><span style="color:#e6db74">&#34;f&#34;</span><span style="color:#f92672">)(</span><span style="color:#ae81ff">2</span><span style="color:#f92672">)</span> <span style="color:#f92672">==</span> h<span style="color:#f92672">.</span><span style="color:#a6e22e">mul</span><span style="color:#f92672">(</span><span style="color:#ae81ff">2</span><span style="color:#f92672">));</span>
-<span style="color:#f92672">}</span>
-</code></pre></div>
-</div>
-<p>
-理想としては set 関数の val に Variant も渡せるようになればかなり実用的なレベルになると思うのですが，エラーチェックとかしんどくなるのでやめました．
-</p>
-<h3 id="headline-6">
-力こそパワー
-</h3>
-<p>
-よく考えたら実行時 eval 作ればいいだけじゃんという脳筋な発想に至り， drepl
-</p>
-<p>
-<a href="https://github.com/dlang-community/drepl">https://github.com/dlang-community/drepl</a>
-</p>
-<p>
-をベースに実行時の文字列を dynamic library にコンパイルして dynamic load すればいいじゃん！と思ったものの，以前 drepl の作者と議論した ODR 違反の話
-</p>
-<p>
-<a href="https://github.com/dlang-community/drepl/issues/4">https://github.com/dlang-community/drepl/issues/4</a>
-</p>
-<p>
-とかこれも真面目にやるとつらいし，そもそも実行時 eval は Ruby でいう binding とかがなければ Rails みたいなフレームワーク作る上で実用的ではないし，壮大すぎるなぁとつらくなり，手が止まっています．もっとパワーをつけたいです．
-</p>
-
-		</div>
-		
-<div class="post__tags tags clearfix">
-	<svg class="tags__icon icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5 0 11V3C0 1.5.8.8.8.8S1.5 0 3 0h8c1.5 0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 1 0 0-6 3 3 0 0 0 0 6z"/></svg>
-	<ul class="tags__list">
-		<li class="tags__item"><a class="tags__link btn" href="/log/tags/d/" rel="tag">D</a></li>
-	</ul>
-</div>
-	</article>
-</main>
-
-<div class="authorbox clearfix">
-	<figure class="authorbox__avatar">
-		<img alt="Shigeki Karita avatar" src="/log/img/avatar.jpg" class="avatar" height="90" width="90">
-	</figure>
-	<div class="authorbox__header">
-		<span class="authorbox__name">About Shigeki Karita</span>
-	</div>
-	<div class="authorbox__description">
-		D言語と日々の研究について雑記
-	</div>
-</div>
-
-<nav class="post-nav flex">
-	<div class="post-nav__item post-nav__item--prev">
-		<a class="post-nav__link" href="/log/posts/keyboards/" rel="prev"><span class="post-nav__caption">«&thinsp;Previous</span><p class="post-nav__post-title">手持ちのキーボードについて</p></a>
-	</div>
-	<div class="post-nav__item post-nav__item--next">
-		<a class="post-nav__link" href="/log/posts/toushitsu1/" rel="next"><span class="post-nav__caption">Next&thinsp;»</span><p class="post-nav__post-title">糖質制限記: 豆腐ハンバーグ</p></a>
-	</div>
-</nav>
-
-
-			</div>
-			
-		</div>
-		<script type="text/x-mathjax-config">
+    <span style=color:#66d9ef>assert</span><span style=color:#f92672>(</span>h<span style=color:#f92672>.</span><span style=color:#a6e22e>set</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;N&#34;</span><span style=color:#f92672>,</span> <span style=color:#ae81ff>1</span><span style=color:#f92672>).</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;N&#34;</span><span style=color:#f92672>)</span> <span style=color:#f92672>==</span> <span style=color:#ae81ff>1</span><span style=color:#f92672>);</span>
+    <span style=color:#66d9ef>assert</span><span style=color:#f92672>(</span>h<span style=color:#f92672>.</span><span style=color:#a6e22e>set</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;S&#34;</span><span style=color:#f92672>,</span> <span style=color:#e6db74>&#34;hi&#34;</span><span style=color:#f92672>).</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;S&#34;</span><span style=color:#f92672>)</span> <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;hi&#34;</span><span style=color:#f92672>);</span>
+    <span style=color:#66d9ef>assert</span><span style=color:#f92672>(</span>h<span style=color:#f92672>.</span><span style=color:#a6e22e>set</span><span style=color:#f92672>!(</span>typeof<span style=color:#f92672>(</span>h<span style=color:#f92672>.</span><span style=color:#a6e22e>f</span><span style=color:#f92672>))(</span><span style=color:#e6db74>&#34;f&#34;</span><span style=color:#f92672>,</span> <span style=color:#f92672>&amp;</span>h<span style=color:#f92672>.</span><span style=color:#a6e22e>mul</span><span style=color:#f92672>).</span><span style=color:#a6e22e>get</span><span style=color:#f92672>(</span><span style=color:#e6db74>&#34;f&#34;</span><span style=color:#f92672>)(</span><span style=color:#ae81ff>2</span><span style=color:#f92672>)</span> <span style=color:#f92672>==</span> h<span style=color:#f92672>.</span><span style=color:#a6e22e>mul</span><span style=color:#f92672>(</span><span style=color:#ae81ff>2</span><span style=color:#f92672>));</span>
+<span style=color:#f92672>}</span>
+</code></pre></div></div><p>理想としては set 関数の val に Variant も渡せるようになればかなり実用的なレベルになると思うのですが，エラーチェックとかしんどくなるのでやめました．</p><h3 id=headline-6>力こそパワー</h3><p>よく考えたら実行時 eval 作ればいいだけじゃんという脳筋な発想に至り， drepl</p><p><a href=https://github.com/dlang-community/drepl>https://github.com/dlang-community/drepl</a></p><p>をベースに実行時の文字列を dynamic library にコンパイルして dynamic load すればいいじゃん！と思ったものの，以前 drepl の作者と議論した ODR 違反の話</p><p><a href=https://github.com/dlang-community/drepl/issues/4>https://github.com/dlang-community/drepl/issues/4</a></p><p>とかこれも真面目にやるとつらいし，そもそも実行時 eval は Ruby でいう binding とかがなければ Rails みたいなフレームワーク作る上で実用的ではないし，壮大すぎるなぁとつらくなり，手が止まっています．もっとパワーをつけたいです．</p></div><div class="post__tags tags clearfix"><svg class="tags__icon icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg><ul class=tags__list><li class=tags__item><a class="tags__link btn" href=/log/tags/d/ rel=tag>D</a></li></ul></div></article></main><div class="authorbox clearfix"><figure class=authorbox__avatar><img alt="Shigeki Karita avatar" src=/log/img/avatar.jpg class=avatar height=90 width=90></figure><div class=authorbox__header><span class=authorbox__name>About Shigeki Karita</span></div><div class=authorbox__description>D言語と日々の研究について雑記</div></div><nav class="post-nav flex"><div class="post-nav__item post-nav__item--prev"><a class=post-nav__link href=/log/posts/keyboards/ rel=prev><span class=post-nav__caption>«&#8201;Previous</span><p class=post-nav__post-title>手持ちのキーボードについて</p></a></div><div class="post-nav__item post-nav__item--next"><a class=post-nav__link href=/log/posts/toushitsu1/ rel=next><span class=post-nav__caption>Next&#8201;»</span><p class=post-nav__post-title>糖質制限記: 豆腐ハンバーグ</p></a></div></nav></div></div><script type=text/x-mathjax-config>
  MathJax.Hub.Config({
      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
      TeX: { equationNumbers: {autoNumber: "AMS"} }
@@ -404,25 +173,4 @@ unittest <span style="color:#f92672">{</span>
      }
  });
 
-</script>
-<script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
-
-<div style="display:table;margin: 0 auto">
-Built at Travis CI <a href="https://travis-ci.org/ShigekiKarita/log"><img src="https://travis-ci.org/ShigekiKarita/log.svg?branch=master" ></a>
-</div>
-
-
-
-
-
-<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<script>
- (adsbygoogle = window.adsbygoogle || []).push({
-     google_ad_client: "ca-pub-6633457078111023",
-     enable_page_level_ads: true
- });
-</script>
-
-	</div>
-<script async defer src="/log/js/menu.js"></script></body>
-</html>
+</script><script type=text/javascript async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script><div style="display:table;margin:0 auto">Built at Travis CI <a href=https://travis-ci.org/ShigekiKarita/log><img src="https://travis-ci.org/ShigekiKarita/log.svg?branch=master"></a></div><script async src=//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js></script><script>(adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:"ca-pub-6633457078111023",enable_page_level_ads:true});</script></div><script async defer src=/log/js/menu.js></script></body></html>
