@@ -1,0 +1,92 @@
+#+title: GitHub ActionsでD言語を使う
+#+summary:
+#+categories: Programming D
+#+tags: CI Actions
+#+draft: false
+#+date: 2020-05-11T18:33:18+09:00
+#+author: Shigeki Karita
+#+isCJKLanguage: true
+#+markup: org
+#+toc: false
+
+Continuous Integration (CI) サービス、みなさんは何を使っていますか？このごろ私の中でCIはGitHub Actions一択になってきました。何より起動が早いのと、Linux/Windows/macOSといったメジャーな環境をサポートしているのが大きいです。GitHubはMicrosoftに買収されてよかったと思います。
+
+** Linuxの設定
+
+以下を ~.github/workflows/linux.yml~ といったファイルで置くだけです。ソースコードは [[https://dub.pm/][dub init コマンド]] で作った一般的なD言語プロジェクトを想定しています。
+
+#+BEGIN_SRC yaml
+name: linux
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    strategy:
+      fail-fast: false  # 一つのコンパイラがエラーになっても止めない
+      max-parallel: 4
+      matrix:
+        compiler: [dmd, ldc, dmd-beta, ldc-beta]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: test
+      run: |
+        source $(curl https://dlang.org/install.sh | bash -s -- ${{ matrix.compiler }} -a)
+        dub test --parallel -b=unittest-cov
+    - name: codecov
+      if: ${{ matrix.compiler == 'dmd' }}
+      run: bash <(curl -s https://codecov.io/bash)
+#+END_SRC
+
+最後の [[https://codecov.io/][codecov]] とはテストのカバーしてる範囲をモニタリングするサービスです。DMD以外のコンパイラはロクにcoverageが動かないので注意してください。
+
+** Windowsの設定
+
+こちらは ~.github/workflows/windows.yml~ などとして保存してください。
+
+#+BEGIN_SRC yaml
+name: windows
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: windows-2019
+
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        compiler: [dmd, ldc]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: test-dmd
+      if: ${{ matrix.compiler == 'dmd' }}
+      run: |
+        Invoke-WebRequest "http://downloads.dlang.org/releases/2.x/2.091.1/dmd.2.091.1.windows.7z" -OutFile dmd.7z
+        7z x dmd.7z -y
+        dmd2/windows/bin64/dub test --parallel -b=unittest-cov
+    - name: test-ldc
+      if: ${{ matrix.compiler == 'ldc' }}
+      run: |
+        Invoke-WebRequest "https://github.com/ldc-developers/ldc/releases/download/v1.21.0/ldc2-1.21.0-windows-x64.7z" -OutFile ldc.7z
+        7z x ldc.7z -y
+        ldc2-1.21.0-windows-x64/bin/dub test --parallel -b=unittest-cov
+#+END_SRC
+
+コンパイラのDLに Invoke-WebRequest を使っていることに注意してください。wgetやcurlといったpowershellのコマンドはなぜか動きません。
+
+** DUBパッケージをキャッシュ化
+
+D言語のパッケージを管理するDUBサーバはときに死んだり、遅かったりするのでActions内でキャッシュすると良いです。
+詳しくは、 [[https://github.com/actions/cache/blob/master/examples.md#d---dub][actions/cache]] にPRして書きましたので参考にしてください。挿入場所としては ~- uses: actions/checkout@v1~ の直後です。
+
+** 実際の例
+
+最近私が設定したCIを列挙して終わりとします。基本的には上記のようなYAMLです。実行結果なども適宜見てみると参考になるかと思います。
+
+- [[https://github.com/ShigekiKarita/tfd/runs/661520821?check_suite_focus=true]]
+- [[https://github.com/ShigekiKarita/pbd/runs/659176844?check_suite_focus=true]]
