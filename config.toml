@@ -3,7 +3,7 @@ languageCode = "jp"
 paginate = "10" # Number of posts per page
 hasCJKLanguage = true
 title = "log"
-theme = "mainroad"
+theme = "simple"
 googleAnalytics = "UA-139201189-1"
 
 pygmentsCodefences=true
