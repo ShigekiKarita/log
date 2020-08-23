@@ -24,15 +24,15 @@ markup: "md"
 
 メーカー製PCを土台としているのは単純に8k円で、より良い構成ができる気がしなかったからです。型番は古いですが、コロナのせいか企業が予備として保存していた未使用品が格安で入手できるのでオススメ。
 
-![proliant-usb](https://pbs.twimg.com/media/EW570uRUwAE0GGD?format=jpg&name=small)
+![proliant-usb](https://pbs.twimg.com/media/EW570uRUwAE0GGD?format=jpg)
 
 OS入れるストレージは、XigmaNASは起動時にRAM上に展開されるため重要ではないので、適当に転がってたUSBメモリに入れましたが、中にUSBポートがあるのでUSBメモリが出っ張るみたいなことがないのも最高です。
 
-![proliant2](https://pbs.twimg.com/media/EW53kSbU8AAJOrM?format=jpg&name=small)
+![proliant2](https://pbs.twimg.com/media/EW53kSbU8AAJOrM?format=jpg)
 
 扉の裏側に冬場の岩の裏みたいにびっしりとHDD用ネジとレンチがついてるので便利。
 
-![red](https://pbs.twimg.com/media/EW5xP9eU4AEtngc?format=jpg&name=small)
+![red](https://pbs.twimg.com/media/EW5xP9eU4AEtngc?format=jpg)
 
 WD Redは何度も買ってますが、こんな耐湿パックに入ってるのは初めて見た。NASを組む上でWD Red 10TBにしたのは、いままで一度も故障したことがない銘柄ということ (GreenとかSeagateは何度も壊れた), WDなど各社が廉価モデルのプラッタをCMRからSMRに切り替えており、Red 8TB以上が最もコスパの良いCMR方式のNAS向けHDDだったためです。[^wd]
 
@@ -49,7 +49,7 @@ ZFSは初めてでしたが、普段使ってるbtrfsと概念的な対応があ
 
 ## 難点
 
-![proliant1](https://pbs.twimg.com/media/EW-mVoBVcAAKsIp?format=jpg&name=small)
+![proliant1](https://pbs.twimg.com/media/EW-mVoBVcAAKsIp?format=jpg)
 
 唯一の難点はProliantファンがマジでうるさいということです。ファンを交換しようかと思いましたが、とりあえずクローゼット内に置いて隔離しています。夏場の一番暑い時期ですが、意外と温度は問題ありませんでした。3ヶ月間一度も止めていなくて心配になってさっき再起動してみましたが、管理ページ起動まで数分かかるのも微妙です。
 
