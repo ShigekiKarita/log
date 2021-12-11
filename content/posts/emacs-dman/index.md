@@ -73,6 +73,13 @@ emacs_value dman_time(
 }
 
 int emacs_module_init(emacs_runtime* ert) {
+  // Validate Emacs runtime and environment.
+  if (ert.size < emacs_runtime.sizeof)
+    return 1;
+  emacs_env* env = ert.get_environment(ert);
+  if (env.size < emacs_env.sizeof)
+    return 2;
+
   // Initialize D runtime.
   Runtime.initialize();
 
@@ -86,6 +93,7 @@ int emacs_module_init(emacs_runtime* ert) {
       /*data=*/null);
   env.funcall(env, env.intern(env, "defalias"),
               fn_sym_pair.length, fn_sym_pair.ptr);
+  return 0;
 }
 ```
 
