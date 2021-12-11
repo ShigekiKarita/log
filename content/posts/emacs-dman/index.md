@@ -66,8 +66,9 @@ int emacs_module_init(emacs_runtime* ert) {
 }
 ```
 
-そして共有ライブラリをコンパイル:
-```
+そして共有ライブラリをコンパイル
+
+```bash
 dmd -shared dman.d -of=dman.so
 ```
 
@@ -96,13 +97,13 @@ dmd -shared dman.d -of=dman.so
     ^  ^
 ```
 
-## 今後
+## 今後の予定
 
-ネタというかHello world的な感じでやってみたら簡単にできた。実用的な段階としては、D言語で書いたコード解析ツールなどをプロセス起動・通信などのオーバーヘッド無しでサクッと呼んでEmacsでのD言語の編集を快適にしたい。あとEmacs lispは好きだけど、D言語で全部書きたい。
+実用的な段階としては、D言語で書いたコード解析ツールなどをプロセス起動・通信などのオーバーヘッド無しでサクッと呼んでEmacsでのD言語の編集を快適にしたい。
 
-具体的には先日D言語のimport文を辞書順にソートするツールを作ったので組み込んでみたい。 https://github.com/ShigekiKarita/d-import-sort
+あとEmacs lispは好きだけど、スコープと型がわかりやすくコンパイルも実行速いD言語で全部書きたい。具体的には先日D言語のimport文を辞書順にソートするツールを作ったので組み込みたい。 https://github.com/ShigekiKarita/d-import-sort
 
-## お知らせ
+## 補足
 
 Emacs lispをD言語が置き換える日まで [serve-d](https://github.com/Pure-D/serve-d) を使おう。簡単な設定ガイドを書きました。
 
