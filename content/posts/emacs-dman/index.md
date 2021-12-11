@@ -41,6 +41,8 @@ C言語用のライブラリを書く話はこの辺にまとまっている（�
 
 ```d
 import emacs_module;
+import core.runtime : Runtime;
+import std.format : format;
 import std.datetime.systime : Clock;
 
 enum string dman = `
