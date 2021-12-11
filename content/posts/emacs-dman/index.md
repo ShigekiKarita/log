@@ -11,6 +11,8 @@ markup: "md"
 toc: true
 ---
 
+[D言語くん Advent Calendar 2021](https://qiita.com/advent-calendar/2021/d-man) 12日目の記事です。
+
 ## tl;dr
 
 Emacs lispからD言語で書いたD言語くんを召喚した
