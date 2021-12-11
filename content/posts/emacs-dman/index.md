@@ -41,13 +41,36 @@ C言語用のライブラリを書く話はこの辺にまとまっている（�
 
 ```d
 import emacs_module;
+import std.datetime.systime : Clock;
+
+enum string dman = `
+ o       o
+ |        \
+  \ ___   /
+   |,-oo\\
+   ||    || < %s
+   ||    ||
+   ||   //
+   ||__//
+   '---
+    \  \
+    /  /
+    ^  ^
+`;
 
 extern (C):
 
 int plugin_is_GPL_compatible;
 
 emacs_value dman_time(
-    emacs_env* env, ptrdiff_t nargs, emacs_value* args, void* data);
+    emacs_env* env, ptrdiff_t nargs, emacs_value* args, void* data) {
+  emacs_value func = env.intern(env, "message");
+  emacs_value[1] args;
+  string hello = format!dman(Clock.currTime());
+  args[0] = env.make_string(env, hello.ptr, hello.length);
+  env.funcall(env, func, args.length, args.ptr);
+  return env.intern(env, "t");
+}
 
 int emacs_module_init(emacs_runtime* ert) {
   // Initialize D runtime.
