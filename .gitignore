@@ -1,5 +1,5 @@
 public/
 hugo
 hugo.tar.xz
-
+.hugo_build.lock
 *~
