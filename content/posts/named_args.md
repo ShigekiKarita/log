@@ -10,6 +10,8 @@ isCJKLanguage: true
 markup: "md"
 ---
 
+[D言語アドベントカレンダー2023](https://qiita.com/advent-calendar/2023/dlang) 4日目の記事です。
+
 ## DIP1030
 
 PythonやOCamlで便利な名前付き引数(named/labeled/keyword arguments)ですが、D言語ではDIP1030により提案され三年前に採択されてます。
